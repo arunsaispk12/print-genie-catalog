@@ -668,3 +668,106 @@ input[type="file"]:hover {
 .text-secondary {
     color: var(--text-secondary);
 }
+
+/* Settings Page */
+.settings-section {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.alert {
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.alert h3, .alert h4 {
+    margin-bottom: 10px;
+}
+
+.alert-info {
+    background: #dbeafe;
+    border-left: 4px solid #3b82f6;
+    color: #1e40af;
+}
+
+.alert-warning {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    color: #92400e;
+}
+
+.alert-success {
+    background: #d1fae5;
+    border-left: 4px solid #10b981;
+    color: #065f46;
+}
+
+.alert-danger {
+    background: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+}
+
+.setup-steps {
+    margin-top: 30px;
+}
+
+.step {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--light-bg);
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+}
+
+.step-number {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.step-content ol {
+    margin-left: 20px;
+    line-height: 1.8;
+}
+
+.step-content ol li {
+    margin-bottom: 8px;
+}
+
+.settings-status {
+    padding: 15px;
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.settings-status.success {
+    border-color: var(--success-color);
+    background: #d1fae5;
+}
+
+.settings-status.error {
+    border-color: var(--danger-color);
+    background: #fee2e2;
+}

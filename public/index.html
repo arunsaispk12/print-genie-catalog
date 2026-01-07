@@ -22,6 +22,7 @@
                 <button class="tab-button" data-tab="catalog-view">View Catalog</button>
                 <button class="tab-button" data-tab="category-manager">Manage Categories</button>
                 <button class="tab-button" data-tab="sku-generator">SKU Generator</button>
+                <button class="tab-button" data-tab="settings">⚙️ Settings</button>
                 <button class="tab-button" data-tab="documentation">Documentation</button>
             </div>
 
@@ -317,6 +318,104 @@
                             <div id="decodedResult" class="decoded-result">
                                 <p>Enter a SKU to see its breakdown</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="card">
+                    <h2>⚙️ Settings - Auto-Publish Configuration</h2>
+
+                    <div class="settings-section">
+                        <div class="alert alert-info">
+                            <h3>🚀 One-Click Publishing</h3>
+                            <p>Enable automatic publishing to GitHub so your catalog updates instantly without manual git commands!</p>
+                        </div>
+
+                        <h3>GitHub Integration Setup</h3>
+
+                        <div class="setup-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>Create GitHub Personal Access Token</h4>
+                                    <ol>
+                                        <li>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Developer Settings → Personal Access Tokens → Tokens (classic)</a></li>
+                                        <li>Click "Generate new token (classic)"</li>
+                                        <li>Note: "Print Genie Catalog Auto-Publish"</li>
+                                        <li>Expiration: Choose 90 days or No expiration</li>
+                                        <li>Select scopes: ✅ <strong>repo</strong> (Full control of private repositories)</li>
+                                        <li>Click "Generate token"</li>
+                                        <li>⚠️ <strong>Copy the token immediately!</strong> (You won't see it again)</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>Enter Your GitHub Information</h4>
+                                    <form id="githubSettingsForm">
+                                        <div class="form-group">
+                                            <label for="githubUsername">GitHub Username *</label>
+                                            <input type="text" id="githubUsername" placeholder="e.g., arunsaispk12" required>
+                                            <small>Your GitHub username (visible in your profile URL)</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="githubRepo">Repository Name *</label>
+                                            <input type="text" id="githubRepo" placeholder="e.g., print-genie-catalog" required>
+                                            <small>Your repository name (without username)</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="githubToken">Personal Access Token *</label>
+                                            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" required>
+                                            <small>⚠️ Keep this secret! Stored locally in your browser only.</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="githubBranch">Branch Name</label>
+                                            <input type="text" id="githubBranch" value="main" placeholder="main">
+                                            <small>Usually "main" or "master"</small>
+                                        </div>
+
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+                                            <button type="button" class="btn btn-secondary" id="testConnectionBtn">🔗 Test Connection</button>
+                                            <button type="button" class="btn btn-danger" id="clearSettingsBtn">🗑️ Clear Settings</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>Status & Information</h4>
+                                    <div id="settingsStatus" class="settings-status">
+                                        <p>No GitHub credentials configured. Please complete steps above.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <h4>⚠️ Security Notes</h4>
+                            <ul>
+                                <li><strong>Token is stored in browser localStorage</strong> - Only on this device</li>
+                                <li><strong>Never share your token</strong> - It gives full access to your repositories</li>
+                                <li><strong>Clear browser data = lost settings</strong> - You'll need to reconfigure</li>
+                                <li><strong>Token is sent to GitHub only</strong> - No third-party servers involved</li>
+                                <li><strong>Use HTTPS only</strong> - Never on public/insecure WiFi</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-success" style="display: none;" id="autoPublishInfo">
+                            <h4>✅ Auto-Publish Enabled!</h4>
+                            <p>When you click "🚀 Publish Catalog" in the View Catalog tab, your products will automatically update on GitHub without any manual commands!</p>
                         </div>
                     </div>
                 </div>

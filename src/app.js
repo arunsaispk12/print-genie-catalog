@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSKUGenerator();
     setupImageHandlers();
     setupCategoryManagement();
+    setupSettings();
     updateCatalogDisplay();
     displayExistingCategories();
 });
@@ -564,25 +565,12 @@ function exportToCSV() {
     URL.revokeObjectURL(url);
 }
 
-// Publish Catalog - Export catalog data for public viewing
-function publishCatalog() {
+// Publish Catalog - Auto-publish to GitHub or manual download
+async function publishCatalog() {
     if (catalog.length === 0) {
         alert('📦 No products in catalog yet!\n\nAdd some products first, then publish your catalog.');
         return;
     }
-
-    const confirmed = confirm(
-        `🚀 Publish Catalog to GitHub\n\n` +
-        `This will:\n` +
-        `1. Download catalog-data.json file\n` +
-        `2. You'll need to replace the file in your repo\n` +
-        `3. Commit and push to GitHub\n` +
-        `4. Your public catalog will be updated!\n\n` +
-        `Current products: ${catalog.length}\n\n` +
-        `Ready to continue?`
-    );
-
-    if (!confirmed) return;
 
     // Create catalog data
     const catalogData = {
@@ -598,35 +586,97 @@ function publishCatalog() {
         }
     };
 
-    // Convert to JSON
-    const jsonContent = JSON.stringify(catalogData, null, 2);
-    const blob = new Blob([jsonContent], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+    // Check if GitHub settings are configured
+    const githubSettings = getGitHubSettings();
 
-    // Download file
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'catalog-data.json';
-    a.click();
-    URL.revokeObjectURL(url);
-
-    // Show instructions
-    setTimeout(() => {
-        alert(
-            `✅ catalog-data.json downloaded!\n\n` +
-            `📋 Next steps:\n\n` +
-            `1. Find the downloaded file (usually in Downloads folder)\n\n` +
-            `2. Replace this file in your repo:\n` +
-            `   public/catalog-data.json\n\n` +
-            `3. Commit and push:\n` +
-            `   git add public/catalog-data.json\n` +
-            `   git commit -m "Update catalog data"\n` +
-            `   git push\n\n` +
-            `4. Wait 1-2 minutes for GitHub Pages to deploy\n\n` +
-            `5. Your public catalog will be live!\n\n` +
-            `💡 Tip: Do this every time you add/update products.`
+    if (githubSettings) {
+        // AUTO-PUBLISH via GitHub API
+        const confirmed = confirm(
+            `🚀 Auto-Publish to GitHub\n\n` +
+            `This will automatically:\n` +
+            `✅ Update catalog-data.json in your repository\n` +
+            `✅ Create a commit with your products\n` +
+            `✅ Make your catalog live in 1-2 minutes\n\n` +
+            `Current products: ${catalog.length}\n` +
+            `Repository: ${githubSettings.username}/${githubSettings.repo}\n\n` +
+            `Ready to publish?`
         );
-    }, 500);
+
+        if (!confirmed) return;
+
+        // Show loading
+        const publishBtn = document.getElementById('publishCatalogBtn');
+        const originalText = publishBtn.textContent;
+        publishBtn.textContent = '⏳ Publishing...';
+        publishBtn.disabled = true;
+
+        try {
+            await publishToGitHub(catalogData);
+
+            alert(
+                `✅ Catalog published successfully!\n\n` +
+                `📊 Published: ${catalog.length} products\n` +
+                `⏰ Wait 1-2 minutes for GitHub Pages to deploy\n\n` +
+                `Your customers will see the updated catalog at:\n` +
+                `${window.location.origin}${window.location.pathname.replace('index.html', '')}catalog.html\n\n` +
+                `💡 Share the link with your customers!`
+            );
+        } catch (error) {
+            console.error('Publish error:', error);
+            alert(
+                `❌ Publishing failed!\n\n` +
+                `Error: ${error.message}\n\n` +
+                `Possible solutions:\n` +
+                `1. Check your GitHub token in Settings tab\n` +
+                `2. Make sure token has 'repo' permissions\n` +
+                `3. Verify repository name is correct\n` +
+                `4. Check your internet connection\n\n` +
+                `Or use manual download instead.`
+            );
+        } finally {
+            publishBtn.textContent = originalText;
+            publishBtn.disabled = false;
+        }
+    } else {
+        // MANUAL DOWNLOAD (fallback if no GitHub settings)
+        const choice = confirm(
+            `📥 Manual Download Mode\n\n` +
+            `GitHub auto-publish is not configured.\n\n` +
+            `Choose an option:\n` +
+            `• Click OK to download catalog-data.json (manual)\n` +
+            `• Click Cancel to go to Settings and configure auto-publish\n\n` +
+            `💡 Tip: Configure GitHub settings for one-click publishing!`
+        );
+
+        if (choice) {
+            // Download file manually
+            const jsonContent = JSON.stringify(catalogData, null, 2);
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'catalog-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            setTimeout(() => {
+                alert(
+                    `✅ catalog-data.json downloaded!\n\n` +
+                    `📋 Next steps:\n\n` +
+                    `1. Replace public/catalog-data.json in your repo\n` +
+                    `2. Run: git add public/catalog-data.json\n` +
+                    `3. Run: git commit -m "Update catalog"\n` +
+                    `4. Run: git push\n` +
+                    `5. Wait 1-2 minutes for deployment\n\n` +
+                    `💡 Want auto-publish? Go to Settings tab!`
+                );
+            }, 500);
+        } else {
+            // Go to Settings tab
+            document.querySelector('[data-tab="settings"]').click();
+        }
+    }
 }
 
 // Show Share Catalog Dialog
@@ -940,6 +990,210 @@ function displayExistingCategories() {
             </div>
         `;
     }).join('');
+}
+
+// Setup Settings
+function setupSettings() {
+    const settingsForm = document.getElementById('githubSettingsForm');
+    const testBtn = document.getElementById('testConnectionBtn');
+    const clearBtn = document.getElementById('clearSettingsBtn');
+
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', saveGitHubSettings);
+    }
+    if (testBtn) {
+        testBtn.addEventListener('click', testGitHubConnection);
+    }
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearGitHubSettings);
+    }
+
+    // Load existing settings
+    loadGitHubSettings();
+}
+
+// Save GitHub Settings
+function saveGitHubSettings(e) {
+    e.preventDefault();
+
+    const settings = {
+        username: document.getElementById('githubUsername').value.trim(),
+        repo: document.getElementById('githubRepo').value.trim(),
+        token: document.getElementById('githubToken').value.trim(),
+        branch: document.getElementById('githubBranch').value.trim() || 'main'
+    };
+
+    // Validate
+    if (!settings.username || !settings.repo || !settings.token) {
+        alert('❌ Please fill in all required fields!');
+        return;
+    }
+
+    // Save to localStorage
+    localStorage.setItem('githubSettings', JSON.stringify(settings));
+
+    // Update UI
+    updateSettingsStatus();
+    document.getElementById('autoPublishInfo').style.display = 'block';
+
+    alert('✅ GitHub settings saved successfully!\n\nYou can now use one-click publishing from the View Catalog tab.');
+}
+
+// Load GitHub Settings
+function loadGitHubSettings() {
+    const settings = getGitHubSettings();
+
+    if (settings) {
+        document.getElementById('githubUsername').value = settings.username;
+        document.getElementById('githubRepo').value = settings.repo;
+        document.getElementById('githubToken').value = settings.token;
+        document.getElementById('githubBranch').value = settings.branch || 'main';
+
+        updateSettingsStatus();
+        document.getElementById('autoPublishInfo').style.display = 'block';
+    }
+}
+
+// Get GitHub Settings
+function getGitHubSettings() {
+    const settingsStr = localStorage.getItem('githubSettings');
+    return settingsStr ? JSON.parse(settingsStr) : null;
+}
+
+// Update Settings Status
+function updateSettingsStatus() {
+    const settings = getGitHubSettings();
+    const statusDiv = document.getElementById('settingsStatus');
+
+    if (settings) {
+        statusDiv.className = 'settings-status success';
+        statusDiv.innerHTML = `
+            <h4 style="color: var(--success-color);">✅ Connected to GitHub</h4>
+            <p><strong>Repository:</strong> ${settings.username}/${settings.repo}</p>
+            <p><strong>Branch:</strong> ${settings.branch}</p>
+            <p><strong>Token:</strong> ${'*'.repeat(20)} (hidden)</p>
+            <p style="margin-top: 10px;"><small>Auto-publish is ready! Go to View Catalog → Click "🚀 Publish Catalog"</small></p>
+        `;
+    } else {
+        statusDiv.className = 'settings-status';
+        statusDiv.innerHTML = '<p>No GitHub credentials configured. Please complete steps above.</p>';
+    }
+}
+
+// Test GitHub Connection
+async function testGitHubConnection() {
+    const settings = getGitHubSettings();
+
+    if (!settings) {
+        alert('❌ Please save your GitHub settings first!');
+        return;
+    }
+
+    const btn = document.getElementById('testConnectionBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ Testing...';
+    btn.disabled = true;
+
+    try {
+        // Test API connection
+        const response = await fetch(`https://api.github.com/repos/${settings.username}/${settings.repo}`, {
+            headers: {
+                'Authorization': `token ${settings.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(`✅ Connection successful!\n\nRepository: ${data.full_name}\nDefault Branch: ${data.default_branch}\n\nAuto-publish is ready to use!`);
+        } else if (response.status === 401) {
+            alert('❌ Authentication failed!\n\nYour token is invalid or expired. Please create a new one.');
+        } else if (response.status === 404) {
+            alert('❌ Repository not found!\n\nPlease check your username and repository name.');
+        } else {
+            alert(`❌ Error: ${response.status}\n\nPlease check your settings and try again.`);
+        }
+    } catch (error) {
+        console.error('Connection test error:', error);
+        alert(`❌ Connection failed!\n\nError: ${error.message}\n\nPlease check your internet connection and try again.`);
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+}
+
+// Clear GitHub Settings
+function clearGitHubSettings() {
+    if (confirm('⚠️ Are you sure you want to clear GitHub settings?\n\nYou will need to reconfigure auto-publish.')) {
+        localStorage.removeItem('githubSettings');
+        document.getElementById('githubSettingsForm').reset();
+        document.getElementById('githubBranch').value = 'main';
+        updateSettingsStatus();
+        document.getElementById('autoPublishInfo').style.display = 'none';
+        alert('✅ Settings cleared successfully!');
+    }
+}
+
+// Publish to GitHub via API
+async function publishToGitHub(catalogData) {
+    const settings = getGitHubSettings();
+
+    if (!settings) {
+        throw new Error('GitHub settings not configured. Please go to Settings tab.');
+    }
+
+    const filePath = 'public/catalog-data.json';
+    const jsonContent = JSON.stringify(catalogData, null, 2);
+    const base64Content = btoa(unescape(encodeURIComponent(jsonContent)));
+
+    // Get current file SHA (needed for updating)
+    const getFileUrl = `https://api.github.com/repos/${settings.username}/${settings.repo}/contents/${filePath}?ref=${settings.branch}`;
+
+    let sha = null;
+    try {
+        const getResponse = await fetch(getFileUrl, {
+            headers: {
+                'Authorization': `token ${settings.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (getResponse.ok) {
+            const fileData = await getResponse.json();
+            sha = fileData.sha;
+        }
+    } catch (error) {
+        console.log('File does not exist yet, will create new');
+    }
+
+    // Update or create file
+    const putUrl = `https://api.github.com/repos/${settings.username}/${settings.repo}/contents/${filePath}`;
+    const putData = {
+        message: `🚀 Auto-publish catalog - ${catalogData.metadata.totalProducts} products`,
+        content: base64Content,
+        branch: settings.branch
+    };
+
+    if (sha) {
+        putData.sha = sha; // Include SHA for update
+    }
+
+    const putResponse = await fetch(putUrl, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${settings.token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(putData)
+    });
+
+    if (!putResponse.ok) {
+        const errorData = await putResponse.json();
+        throw new Error(errorData.message || 'Failed to update GitHub');
+    }
+
+    return await putResponse.json();
 }
 
 // Initial stats update
