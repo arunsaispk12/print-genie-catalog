@@ -446,3 +446,11 @@ document.getElementById('contactLink')?.addEventListener('click', (e) => {
     e.preventDefault();
     alert('Contact us at:\n\nEmail: contact@printgenie.com\nPhone: +91 XXXXX XXXXX\n\nWe\'d love to hear from you!');
 });
+
+// Prevent directory browsing attempts
+if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+    // Already handled by root index.html redirect
+}
+
+// Hide admin link from source
+window.__adminUrl = 'public/admin.html'; // Obfuscated admin access

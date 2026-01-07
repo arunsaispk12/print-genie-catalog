@@ -1,0 +1,25 @@
+# robots.txt for Print Genie Catalog
+
+# Allow public catalog
+User-agent: *
+Allow: /public/catalog.html
+Allow: /public/catalog-styles.css
+Allow: /public/catalog-data.json
+Allow: /index.html
+
+# Disallow admin and source files
+Disallow: /public/admin.html
+Disallow: /public/styles.css
+Disallow: /src/
+Disallow: /*.md
+Disallow: /*.js
+Disallow: /HOW_TO_PUBLISH.md
+Disallow: /AUTO_PUBLISH_SETUP.md
+Disallow: /CATEGORY_STRUCTURE.md
+Disallow: /SKU_SYSTEM.md
+Disallow: /PRODUCT_NAMING_GUIDE.md
+Disallow: /FEATURES_UPDATE_v1.1.md
+Disallow: /RELEASE_NOTES_v1.1.md
+
+# Sitemap (optional)
+Sitemap: https://arunsaispk12.github.io/print-genie-catalog/sitemap.xml
