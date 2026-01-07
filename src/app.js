@@ -392,12 +392,16 @@ function setupCatalogView() {
     const filterCategory = document.getElementById('filterCategory');
     const exportBtn = document.getElementById('exportBtn');
     const loadSamplesBtn = document.getElementById('loadSamplesBtn');
+    const shareCatalogBtn = document.getElementById('shareCatalogBtn');
 
     searchInput.addEventListener('input', updateCatalogDisplay);
     filterCategory.addEventListener('change', updateCatalogDisplay);
     exportBtn.addEventListener('click', exportToCSV);
     if (loadSamplesBtn) {
         loadSamplesBtn.addEventListener('click', loadSampleProducts);
+    }
+    if (shareCatalogBtn) {
+        shareCatalogBtn.addEventListener('click', showShareCatalogDialog);
     }
 }
 
@@ -554,6 +558,63 @@ function exportToCSV() {
     a.download = `print-genie-catalog-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+// Show Share Catalog Dialog
+function showShareCatalogDialog() {
+    if (catalog.length === 0) {
+        alert('📦 No products in catalog yet!\n\nAdd some products first, then share your catalog with customers.');
+        return;
+    }
+
+    // Get the public catalog URL
+    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+    const catalogUrl = baseUrl + 'catalog.html';
+
+    // Create a nice dialog with share options
+    const dialogContent = `
+🎉 Your Public Catalog is Ready!
+
+Share this link with your customers:
+${catalogUrl}
+
+Options:
+1️⃣ Copy Link - Copy to clipboard
+2️⃣ Open Catalog - Preview in new tab
+3️⃣ WhatsApp - Share via WhatsApp
+4️⃣ Cancel
+
+Your catalog has ${catalog.length} product${catalog.length !== 1 ? 's' : ''} ready to share!
+    `;
+
+    const choice = prompt(dialogContent, '1');
+
+    switch(choice) {
+        case '1':
+            // Copy to clipboard
+            navigator.clipboard.writeText(catalogUrl).then(() => {
+                alert('✅ Link copied to clipboard!\n\n' + catalogUrl + '\n\nYou can now paste and share this link with your customers.');
+            }).catch(() => {
+                // Fallback if clipboard API doesn't work
+                prompt('Copy this link:', catalogUrl);
+            });
+            break;
+        case '2':
+            // Open in new tab
+            window.open(catalogUrl, '_blank');
+            break;
+        case '3':
+            // Share via WhatsApp
+            const whatsappText = encodeURIComponent(`Check out our 3D printing catalog! ${catalogUrl}`);
+            window.open(`https://wa.me/?text=${whatsappText}`, '_blank');
+            break;
+        case '4':
+        case null:
+            // Cancel
+            break;
+        default:
+            alert('Invalid choice. Please try again.');
+    }
 }
 
 // Setup SKU Generator
