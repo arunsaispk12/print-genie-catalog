@@ -1,5 +1,6 @@
 // Print Genie Catalog Builder - Main Application
 import catalogData from './data/catalogData.js';
+import sampleProducts from './data/sampleProducts.js';
 
 // Application State
 let catalog = JSON.parse(localStorage.getItem('printGenieCatalog')) || [];
@@ -239,10 +240,59 @@ function setupCatalogView() {
     const searchInput = document.getElementById('searchCatalog');
     const filterCategory = document.getElementById('filterCategory');
     const exportBtn = document.getElementById('exportBtn');
+    const loadSamplesBtn = document.getElementById('loadSamplesBtn');
 
     searchInput.addEventListener('input', updateCatalogDisplay);
     filterCategory.addEventListener('change', updateCatalogDisplay);
     exportBtn.addEventListener('click', exportToCSV);
+    if (loadSamplesBtn) {
+        loadSamplesBtn.addEventListener('click', loadSampleProducts);
+    }
+}
+
+// Load Sample Products
+function loadSampleProducts() {
+    const confirmLoad = confirm(
+        `Load ${sampleProducts.length} sample products?\n\n` +
+        `This will add:\n` +
+        `- ${sampleProducts.filter(p => p.category.includes('Tech')).length} Tech products\n` +
+        `- ${sampleProducts.filter(p => p.category.includes('Home')).length} Home products\n` +
+        `- ${sampleProducts.filter(p => p.category.includes('Toys')).length} Toys\n` +
+        `- ${sampleProducts.filter(p => p.category.includes('Custom')).length} Custom prints\n` +
+        `- ${sampleProducts.filter(p => p.category.includes('Material')).length} Materials\n` +
+        `- And more...\n\n` +
+        `Existing products will be preserved.`
+    );
+
+    if (!confirmLoad) return;
+
+    // Update sequence number to avoid conflicts
+    const highestSeq = Math.max(
+        ...catalog.map(p => parseInt(p.sku.split('-').pop())),
+        ...sampleProducts.map(p => parseInt(p.sku.split('-').pop())),
+        0
+    );
+    nextSequence = highestSeq + 1;
+
+    // Add sample products
+    catalog.push(...sampleProducts);
+
+    // Save to localStorage
+    localStorage.setItem('printGenieCatalog', JSON.stringify(catalog));
+    localStorage.setItem('nextSequence', nextSequence.toString());
+
+    // Update display
+    updateCatalogDisplay();
+
+    // Show success message
+    alert(
+        `✅ Successfully loaded ${sampleProducts.length} sample products!\n\n` +
+        `Check out the catalog to see products from all categories:\n` +
+        `- Pre-designed products (Tech, Home, Toys, Auto, Jewelry, Office)\n` +
+        `- Custom prints and prototypes\n` +
+        `- Filaments and accessories\n\n` +
+        `Total products in catalog: ${catalog.length}`
+    );
 }
 
 // Update Catalog Display
