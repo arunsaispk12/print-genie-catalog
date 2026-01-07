@@ -13,25 +13,53 @@ document.addEventListener('DOMContentLoaded', () => {
     setupShareLink();
 });
 
-// Load products from localStorage
+// Load products from catalog-data.json
 function loadProducts() {
-    const catalogData = localStorage.getItem('printGenieCatalog');
-
-    if (catalogData) {
-        try {
-            allProducts = JSON.parse(catalogData);
-            extractCategories();
-            populateCategoryFilter();
-            applyFilters();
-            updateStats();
-            updateCatalogInfo();
-        } catch (error) {
-            console.error('Error loading products:', error);
-            showError('Failed to load products');
-        }
-    } else {
-        showEmptyState('No products available yet. Check back soon!');
-    }
+    // Fetch catalog data from JSON file
+    fetch('catalog-data.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Catalog data not found');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.products && data.products.length > 0) {
+                allProducts = data.products;
+                extractCategories();
+                populateCategoryFilter();
+                applyFilters();
+                updateStats();
+                updateCatalogInfo(data);
+            } else {
+                showEmptyState('No products available yet. Check back soon!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading catalog:', error);
+            // Fallback to localStorage for local testing
+            const localData = localStorage.getItem('printGenieCatalog');
+            if (localData) {
+                try {
+                    allProducts = JSON.parse(localData);
+                    if (allProducts.length > 0) {
+                        extractCategories();
+                        populateCategoryFilter();
+                        applyFilters();
+                        updateStats();
+                        updateCatalogInfo();
+                        console.log('Loaded from localStorage (development mode)');
+                    } else {
+                        showEmptyState('No products available yet. Admin needs to publish the catalog!');
+                    }
+                } catch (err) {
+                    console.error('Error parsing localStorage:', err);
+                    showEmptyState('No products available yet. Admin needs to publish the catalog!');
+                }
+            } else {
+                showEmptyState('No products available yet. Admin needs to publish the catalog!');
+            }
+        });
 }
 
 // Extract unique categories
@@ -286,9 +314,14 @@ function updateStats() {
 }
 
 // Update catalog info
-function updateCatalogInfo() {
+function updateCatalogInfo(data) {
     const info = document.getElementById('catalogInfo');
-    info.textContent = `${allProducts.length} Products Available`;
+    if (data && data.lastUpdated) {
+        const updateDate = new Date(data.lastUpdated).toLocaleDateString();
+        info.textContent = `${allProducts.length} Products Available • Updated ${updateDate}`;
+    } else {
+        info.textContent = `${allProducts.length} Products Available`;
+    }
 }
 
 // Clear filters

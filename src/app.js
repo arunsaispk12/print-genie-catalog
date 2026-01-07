@@ -392,6 +392,7 @@ function setupCatalogView() {
     const filterCategory = document.getElementById('filterCategory');
     const exportBtn = document.getElementById('exportBtn');
     const loadSamplesBtn = document.getElementById('loadSamplesBtn');
+    const publishCatalogBtn = document.getElementById('publishCatalogBtn');
     const shareCatalogBtn = document.getElementById('shareCatalogBtn');
 
     searchInput.addEventListener('input', updateCatalogDisplay);
@@ -399,6 +400,9 @@ function setupCatalogView() {
     exportBtn.addEventListener('click', exportToCSV);
     if (loadSamplesBtn) {
         loadSamplesBtn.addEventListener('click', loadSampleProducts);
+    }
+    if (publishCatalogBtn) {
+        publishCatalogBtn.addEventListener('click', publishCatalog);
     }
     if (shareCatalogBtn) {
         shareCatalogBtn.addEventListener('click', showShareCatalogDialog);
@@ -558,6 +562,71 @@ function exportToCSV() {
     a.download = `print-genie-catalog-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+// Publish Catalog - Export catalog data for public viewing
+function publishCatalog() {
+    if (catalog.length === 0) {
+        alert('📦 No products in catalog yet!\n\nAdd some products first, then publish your catalog.');
+        return;
+    }
+
+    const confirmed = confirm(
+        `🚀 Publish Catalog to GitHub\n\n` +
+        `This will:\n` +
+        `1. Download catalog-data.json file\n` +
+        `2. You'll need to replace the file in your repo\n` +
+        `3. Commit and push to GitHub\n` +
+        `4. Your public catalog will be updated!\n\n` +
+        `Current products: ${catalog.length}\n\n` +
+        `Ready to continue?`
+    );
+
+    if (!confirmed) return;
+
+    // Create catalog data
+    const catalogData = {
+        products: catalog,
+        lastUpdated: new Date().toISOString(),
+        metadata: {
+            businessName: "Print Genie",
+            currency: "INR",
+            currencySymbol: "₹",
+            totalProducts: catalog.length,
+            categories: Array.from(new Set(catalog.map(p => p.category))),
+            version: "1.1"
+        }
+    };
+
+    // Convert to JSON
+    const jsonContent = JSON.stringify(catalogData, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    // Download file
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'catalog-data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    // Show instructions
+    setTimeout(() => {
+        alert(
+            `✅ catalog-data.json downloaded!\n\n` +
+            `📋 Next steps:\n\n` +
+            `1. Find the downloaded file (usually in Downloads folder)\n\n` +
+            `2. Replace this file in your repo:\n` +
+            `   public/catalog-data.json\n\n` +
+            `3. Commit and push:\n` +
+            `   git add public/catalog-data.json\n` +
+            `   git commit -m "Update catalog data"\n` +
+            `   git push\n\n` +
+            `4. Wait 1-2 minutes for GitHub Pages to deploy\n\n` +
+            `5. Your public catalog will be live!\n\n` +
+            `💡 Tip: Do this every time you add/update products.`
+        );
+    }, 500);
 }
 
 // Show Share Catalog Dialog
