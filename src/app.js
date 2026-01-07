@@ -567,53 +567,86 @@ function showShareCatalogDialog() {
         return;
     }
 
-    // Get the public catalog URL
-    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-    const catalogUrl = baseUrl + 'catalog.html';
+    // Get the public catalog URL - handle both local and GitHub Pages
+    let catalogUrl;
+    const currentUrl = window.location.href;
 
-    // Create a nice dialog with share options
-    const dialogContent = `
-🎉 Your Public Catalog is Ready!
+    if (currentUrl.includes('index.html')) {
+        // Replace index.html with catalog.html
+        catalogUrl = currentUrl.replace('index.html', 'catalog.html');
+    } else if (currentUrl.endsWith('/public/')) {
+        // Add catalog.html to the end
+        catalogUrl = currentUrl + 'catalog.html';
+    } else if (currentUrl.endsWith('/public')) {
+        // Add /catalog.html
+        catalogUrl = currentUrl + '/catalog.html';
+    } else {
+        // Fallback: use current directory + catalog.html
+        const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+        catalogUrl = baseUrl + 'catalog.html';
+    }
 
-Share this link with your customers:
-${catalogUrl}
+    // Show share dialog with better formatting
+    const confirmed = confirm(
+        `🎉 Your Public Catalog is Ready!\n\n` +
+        `You have ${catalog.length} product${catalog.length !== 1 ? 's' : ''} ready to share.\n\n` +
+        `Catalog URL:\n${catalogUrl}\n\n` +
+        `Click OK to see sharing options, or Cancel to close.`
+    );
 
-Options:
-1️⃣ Copy Link - Copy to clipboard
-2️⃣ Open Catalog - Preview in new tab
-3️⃣ WhatsApp - Share via WhatsApp
-4️⃣ Cancel
+    if (!confirmed) return;
 
-Your catalog has ${catalog.length} product${catalog.length !== 1 ? 's' : ''} ready to share!
-    `;
-
-    const choice = prompt(dialogContent, '1');
+    // Show options
+    const choice = prompt(
+        `📤 Share Your Catalog\n\n` +
+        `Choose an option:\n\n` +
+        `1 - Copy link to clipboard\n` +
+        `2 - Open catalog preview\n` +
+        `3 - Share via WhatsApp\n` +
+        `4 - Show link (to copy manually)\n` +
+        `\nEnter 1, 2, 3, or 4:`,
+        '1'
+    );
 
     switch(choice) {
         case '1':
             // Copy to clipboard
-            navigator.clipboard.writeText(catalogUrl).then(() => {
-                alert('✅ Link copied to clipboard!\n\n' + catalogUrl + '\n\nYou can now paste and share this link with your customers.');
-            }).catch(() => {
-                // Fallback if clipboard API doesn't work
-                prompt('Copy this link:', catalogUrl);
-            });
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(catalogUrl).then(() => {
+                    alert('✅ Link copied to clipboard!\n\n' + catalogUrl + '\n\nPaste this link to share with your customers.');
+                }).catch((err) => {
+                    console.error('Clipboard error:', err);
+                    prompt('Copy this link manually (Ctrl+C or Cmd+C):', catalogUrl);
+                });
+            } else {
+                // Fallback for browsers without clipboard API
+                prompt('Copy this link (Ctrl+C or Cmd+C, then press OK):', catalogUrl);
+            }
             break;
         case '2':
             // Open in new tab
-            window.open(catalogUrl, '_blank');
+            const newWindow = window.open(catalogUrl, '_blank');
+            if (!newWindow) {
+                alert('⚠️ Pop-up blocked!\n\nPlease allow pop-ups and try again.\n\nOr copy this link manually:\n' + catalogUrl);
+            }
             break;
         case '3':
             // Share via WhatsApp
-            const whatsappText = encodeURIComponent(`Check out our 3D printing catalog! ${catalogUrl}`);
-            window.open(`https://wa.me/?text=${whatsappText}`, '_blank');
+            const whatsappText = encodeURIComponent(`Check out Print Genie's 3D printing catalog! 🧞\n\n${catalogUrl}`);
+            const whatsappUrl = `https://wa.me/?text=${whatsappText}`;
+            const whatsappWindow = window.open(whatsappUrl, '_blank');
+            if (!whatsappWindow) {
+                alert('⚠️ Pop-up blocked!\n\nPlease allow pop-ups, or copy this link:\n' + catalogUrl);
+            }
             break;
         case '4':
-        case null:
-            // Cancel
+            // Show link for manual copy
+            prompt('Copy this link (Ctrl+C or Cmd+C):', catalogUrl);
             break;
         default:
-            alert('Invalid choice. Please try again.');
+            if (choice !== null) {
+                alert('Invalid choice. Please click the Share button again and enter 1, 2, 3, or 4.');
+            }
     }
 }
 
