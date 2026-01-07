@@ -2,6 +2,12 @@
 
 A comprehensive catalog builder and management system for Print Genie's 3D printing business. This system includes category structures, SKU generation, product naming conventions, and a web-based catalog builder.
 
+## 🌐 Live Demo
+
+**Try it now:** https://arunsaispk12.github.io/print-genie-catalog/public/
+
+The catalog builder is hosted on GitHub Pages and ready to use!
+
 ## 📋 Project Overview
 
 Print Genie offers four main product types:
