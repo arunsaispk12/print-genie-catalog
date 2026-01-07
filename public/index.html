@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Genie - Catalog Builder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🧞 Print Genie</h1>
+                <p class="subtitle">3D Printing Catalog Builder</p>
+            </div>
+        </header>
+
+        <main>
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="add-product">Add Product</button>
+                <button class="tab-button" data-tab="catalog-view">View Catalog</button>
+                <button class="tab-button" data-tab="sku-generator">SKU Generator</button>
+                <button class="tab-button" data-tab="documentation">Documentation</button>
+            </div>
+
+            <!-- Add Product Tab -->
+            <div id="add-product" class="tab-content active">
+                <div class="card">
+                    <h2>Add New Product</h2>
+                    <form id="productForm">
+                        <div class="form-grid">
+                            <!-- Product Name -->
+                            <div class="form-group full-width">
+                                <label for="productName">Product Name *</label>
+                                <input type="text" id="productName" required
+                                       placeholder="e.g., Phone Stand - Adjustable Angle - PLA (Medium)"
+                                       maxlength="80">
+                                <small>Max 80 characters. Follow naming guide format.</small>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="form-group">
+                                <label for="category">Category *</label>
+                                <select id="category" required>
+                                    <option value="">Select category...</option>
+                                </select>
+                            </div>
+
+                            <!-- Subcategory -->
+                            <div class="form-group">
+                                <label for="subcategory">Subcategory *</label>
+                                <select id="subcategory" required disabled>
+                                    <option value="">Select category first...</option>
+                                </select>
+                            </div>
+
+                            <!-- Material -->
+                            <div class="form-group">
+                                <label for="material">Material *</label>
+                                <select id="material" required>
+                                    <option value="">Select material...</option>
+                                </select>
+                            </div>
+
+                            <!-- Color -->
+                            <div class="form-group">
+                                <label for="color">Color *</label>
+                                <select id="color" required>
+                                    <option value="">Select color...</option>
+                                </select>
+                            </div>
+
+                            <!-- Size -->
+                            <div class="form-group">
+                                <label for="size">Size *</label>
+                                <select id="size" required>
+                                    <option value="">Select size...</option>
+                                </select>
+                            </div>
+
+                            <!-- Custom Size -->
+                            <div class="form-group">
+                                <label for="customSize">Custom Size (Optional)</label>
+                                <input type="text" id="customSize"
+                                       placeholder="e.g., 100X50X30 (mm)">
+                                <small>Override size with specific dimensions</small>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="form-group">
+                                <label for="price">Price ($) *</label>
+                                <input type="number" id="price" step="0.01" min="0" required
+                                       placeholder="0.00">
+                            </div>
+
+                            <!-- Stock -->
+                            <div class="form-group">
+                                <label for="stock">Stock Quantity</label>
+                                <input type="number" id="stock" min="0" value="0"
+                                       placeholder="0">
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-group full-width">
+                                <label for="description">Product Description</label>
+                                <textarea id="description" rows="4"
+                                          placeholder="Detailed product description, features, and specifications..."></textarea>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="form-group full-width">
+                                <label for="tags">Tags (comma-separated)</label>
+                                <input type="text" id="tags"
+                                       placeholder="e.g., desk, organizer, office, modern">
+                            </div>
+                        </div>
+
+                        <!-- Generated SKU Display -->
+                        <div class="sku-preview">
+                            <h3>Generated SKU:</h3>
+                            <div class="sku-display" id="skuDisplay">
+                                <span class="sku-code">Complete form to generate SKU</span>
+                            </div>
+                            <small class="sku-breakdown" id="skuBreakdown"></small>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Add Product to Catalog</button>
+                            <button type="reset" class="btn btn-secondary">Clear Form</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Catalog View Tab -->
+            <div id="catalog-view" class="tab-content">
+                <div class="card">
+                    <div class="catalog-header">
+                        <h2>Product Catalog</h2>
+                        <div class="catalog-actions">
+                            <input type="text" id="searchCatalog" placeholder="Search products..." class="search-input">
+                            <select id="filterCategory" class="filter-select">
+                                <option value="">All Categories</option>
+                            </select>
+                            <button class="btn btn-secondary" id="exportBtn">Export CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 id="totalProducts">0</h3>
+                            <p>Total Products</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="totalCategories">0</h3>
+                            <p>Categories</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="totalValue">$0.00</h3>
+                            <p>Total Inventory Value</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="lowStock">0</h3>
+                            <p>Low Stock Items</p>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="catalogTable">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Material</th>
+                                    <th>Color</th>
+                                    <th>Size</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="catalogTableBody">
+                                <tr>
+                                    <td colspan="9" class="empty-state">No products in catalog. Add your first product!</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SKU Generator Tab -->
+            <div id="sku-generator" class="tab-content">
+                <div class="card">
+                    <h2>SKU Generator & Decoder</h2>
+
+                    <div class="sku-tools">
+                        <div class="sku-tool">
+                            <h3>Quick SKU Generator</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Category Code</label>
+                                    <input type="text" id="genCategory" placeholder="e.g., PDTC01" maxlength="6">
+                                </div>
+                                <div class="form-group">
+                                    <label>Material Code</label>
+                                    <input type="text" id="genMaterial" placeholder="e.g., PLA" maxlength="3">
+                                </div>
+                                <div class="form-group">
+                                    <label>Color Code</label>
+                                    <input type="text" id="genColor" placeholder="e.g., BLK" maxlength="3">
+                                </div>
+                                <div class="form-group">
+                                    <label>Size Code</label>
+                                    <input type="text" id="genSize" placeholder="e.g., M" maxlength="5">
+                                </div>
+                            </div>
+                            <div class="generated-sku">
+                                <strong>Generated SKU:</strong>
+                                <span id="generatedSKU">PG-XXXXX-XXX-XXX-XXX-0000</span>
+                            </div>
+                        </div>
+
+                        <div class="sku-tool">
+                            <h3>SKU Decoder</h3>
+                            <div class="form-group full-width">
+                                <label>Enter SKU to Decode</label>
+                                <input type="text" id="decodeSKU" placeholder="e.g., PG-PDTC01-PLA-BLK-M-0001">
+                            </div>
+                            <div id="decodedResult" class="decoded-result">
+                                <p>Enter a SKU to see its breakdown</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentation Tab -->
+            <div id="documentation" class="tab-content">
+                <div class="card">
+                    <h2>Quick Reference</h2>
+
+                    <div class="doc-section">
+                        <h3>SKU Format</h3>
+                        <code>PG-[CATEGORY]-[MATERIAL]-[COLOR]-[SIZE]-[SEQ]</code>
+                        <p>Example: <strong>PG-PDTC01-PLA-BLK-M-0001</strong></p>
+                    </div>
+
+                    <div class="doc-section">
+                        <h3>Product Naming Formula</h3>
+                        <code>[Function/Type] - [Distinctive Feature] - [Material] ([Size])</code>
+                        <p>Example: <strong>Phone Stand - Adjustable Angle - PLA (Medium)</strong></p>
+                    </div>
+
+                    <div class="doc-grid">
+                        <div class="doc-card">
+                            <h4>Common Materials</h4>
+                            <ul>
+                                <li><strong>PLA</strong> - Standard filament</li>
+                                <li><strong>PLP</strong> - PLA+ (Enhanced)</li>
+                                <li><strong>PET</strong> - PETG</li>
+                                <li><strong>ABS</strong> - ABS filament</li>
+                                <li><strong>TPU</strong> - Flexible</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-card">
+                            <h4>Common Colors</h4>
+                            <ul>
+                                <li><strong>BLK</strong> - Black</li>
+                                <li><strong>WHT</strong> - White</li>
+                                <li><strong>GRY</strong> - Gray</li>
+                                <li><strong>RED</strong> - Red</li>
+                                <li><strong>BLU</strong> - Blue</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-card">
+                            <h4>Size Codes</h4>
+                            <ul>
+                                <li><strong>XS</strong> - Extra Small (&lt;50mm)</li>
+                                <li><strong>S</strong> - Small (50-100mm)</li>
+                                <li><strong>M</strong> - Medium (100-150mm)</li>
+                                <li><strong>L</strong> - Large (150-200mm)</li>
+                                <li><strong>XL</strong> - Extra Large (200-250mm)</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-card">
+                            <h4>Full Documentation</h4>
+                            <p>For complete guides, see:</p>
+                            <ul>
+                                <li>CATEGORY_STRUCTURE.md</li>
+                                <li>SKU_SYSTEM.md</li>
+                                <li>PRODUCT_NAMING_GUIDE.md</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Print Genie - 3D Printing Catalog System v1.0</p>
+        </footer>
+    </div>
+
+    <script type="module" src="../src/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "print-genie-catalog",
+  "version": "1.0.0",
+  "description": "3D Printing Catalog Builder and Management System for Print Genie",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "npx http-server -p 8000 -o public/",
+    "dev": "npx http-server -p 8000 public/",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [
+    "catalog",
+    "3d-printing",
+    "inventory",
+    "sku-generator",
+    "product-management"
+  ],
+  "author": "Print Genie",
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/print-genie/catalog"
+  }
+}
