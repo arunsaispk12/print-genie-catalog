@@ -1,12 +1,10 @@
-// Print Genie Catalog Builder - Main Application v1.1.0
+// Print Genie Catalog Builder - Main Application
 import catalogData from './data/catalogData.js';
 import sampleProducts from './data/sampleProducts.js';
 
 // Application State
 let catalog = JSON.parse(localStorage.getItem('printGenieCatalog')) || [];
 let nextSequence = parseInt(localStorage.getItem('nextSequence')) || 1;
-let customCategories = JSON.parse(localStorage.getItem('customCategories')) || {};
-let currentImageData = null;
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,10 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupFormHandlers();
     setupCatalogView();
     setupSKUGenerator();
-    setupImageHandlers();
-    setupCategoryManagement();
     updateCatalogDisplay();
-    displayExistingCategories();
 });
 
 // Tab Management
@@ -37,34 +32,8 @@ function initializeTabs() {
             // Add active class to clicked
             button.classList.add('active');
             document.getElementById(targetTab).classList.add('active');
-
-            // Refresh category display when switching to category manager
-            if (targetTab === 'category-manager') {
-                displayExistingCategories();
-            }
         });
     });
-}
-
-// Get All Categories (default + custom)
-function getAllCategories() {
-    const allCategories = { ...catalogData.categories };
-
-    // Merge custom categories
-    Object.entries(customCategories).forEach(([categoryName, categoryData]) => {
-        if (allCategories[categoryName]) {
-            // Merge subcategories if category exists
-            allCategories[categoryName].subcategories = {
-                ...allCategories[categoryName].subcategories,
-                ...categoryData.subcategories
-            };
-        } else {
-            // Add new category
-            allCategories[categoryName] = categoryData;
-        }
-    });
-
-    return allCategories;
 }
 
 // Populate Form Options
@@ -72,33 +41,17 @@ function populateFormOptions() {
     // Populate Categories
     const categorySelect = document.getElementById('category');
     const filterCategory = document.getElementById('filterCategory');
-    const parentCategory = document.getElementById('parentCategory');
 
-    // Clear existing options (except first)
-    categorySelect.innerHTML = '<option value="">Select category...</option>';
-    filterCategory.innerHTML = '<option value="">All Categories</option>';
-    if (parentCategory) {
-        parentCategory.innerHTML = '<option value="">Select parent category...</option>';
-    }
-
-    const allCategories = getAllCategories();
-
-    Object.entries(allCategories).forEach(([name, data]) => {
+    Object.entries(catalogData.categories).forEach(([name, data]) => {
         const option = new Option(name, name);
         categorySelect.add(option);
 
         const filterOption = new Option(name, name);
         filterCategory.add(filterOption);
-
-        if (parentCategory) {
-            const parentOption = new Option(name, name);
-            parentCategory.add(parentOption);
-        }
     });
 
     // Populate Materials
     const materialSelect = document.getElementById('material');
-    materialSelect.innerHTML = '<option value="">Select material...</option>';
     Object.entries(catalogData.materials).forEach(([code, data]) => {
         const option = new Option(`${code} - ${data.name}`, code);
         materialSelect.add(option);
@@ -106,7 +59,6 @@ function populateFormOptions() {
 
     // Populate Colors
     const colorSelect = document.getElementById('color');
-    colorSelect.innerHTML = '<option value="">Select color...</option>';
     const standardColors = catalogData.colors.standard;
     const specialColors = catalogData.colors.special;
 
@@ -128,7 +80,6 @@ function populateFormOptions() {
 
     // Populate Sizes
     const sizeSelect = document.getElementById('size');
-    sizeSelect.innerHTML = '<option value="">Select size...</option>';
     const standardSizes = catalogData.sizes.standard;
     const specialSizes = catalogData.sizes.special;
 
@@ -160,11 +111,9 @@ function setupFormHandlers() {
         const selectedCategory = e.target.value;
         subcategorySelect.innerHTML = '<option value="">Select subcategory...</option>';
 
-        const allCategories = getAllCategories();
-
-        if (selectedCategory && allCategories[selectedCategory]) {
+        if (selectedCategory && catalogData.categories[selectedCategory]) {
             subcategorySelect.disabled = false;
-            const subcategories = allCategories[selectedCategory].subcategories;
+            const subcategories = catalogData.categories[selectedCategory].subcategories;
 
             Object.entries(subcategories).forEach(([name, data]) => {
                 const option = new Option(`${name} (${data.code})`, data.code);
@@ -196,106 +145,9 @@ function setupFormHandlers() {
             subcategorySelect.disabled = true;
             subcategorySelect.innerHTML = '<option value="">Select category first...</option>';
             updateSKUPreview();
-            clearImagePreview();
-            currentImageData = null;
         }, 0);
     });
 }
-
-// Setup Image Handlers
-function setupImageHandlers() {
-    const imageUpload = document.getElementById('imageUpload');
-    const imageUrl = document.getElementById('imageUrl');
-
-    if (imageUpload) {
-        imageUpload.addEventListener('change', handleImageUpload);
-    }
-
-    if (imageUrl) {
-        imageUrl.addEventListener('input', handleImageURL);
-    }
-}
-
-// Handle Image Upload
-function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Check file size (2MB limit)
-    if (file.size > 2 * 1024 * 1024) {
-        alert('Image size must be less than 2MB');
-        e.target.value = '';
-        return;
-    }
-
-    // Check file type
-    if (!file.type.startsWith('image/')) {
-        alert('Please select a valid image file');
-        e.target.value = '';
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        currentImageData = event.target.result;
-        displayImagePreview(currentImageData);
-        // Clear URL input if image was uploaded
-        document.getElementById('imageUrl').value = '';
-    };
-    reader.readAsDataURL(file);
-}
-
-// Handle Image URL
-function handleImageURL(e) {
-    const url = e.target.value.trim();
-    if (!url) {
-        clearImagePreview();
-        currentImageData = null;
-        return;
-    }
-
-    // Basic URL validation
-    try {
-        new URL(url);
-        currentImageData = url;
-        displayImagePreview(url);
-        // Clear file input if URL was provided
-        document.getElementById('imageUpload').value = '';
-    } catch (error) {
-        // Invalid URL, don't show preview yet
-        clearImagePreview();
-        currentImageData = null;
-    }
-}
-
-// Display Image Preview
-function displayImagePreview(imageData) {
-    const form = document.getElementById('productForm');
-    let preview = form.querySelector('.image-preview');
-
-    if (!preview) {
-        preview = document.createElement('div');
-        preview.className = 'image-preview';
-        const imageUrlGroup = form.querySelector('#imageUrl').closest('.form-group');
-        imageUrlGroup.after(preview);
-    }
-
-    preview.innerHTML = `
-        <img src="${imageData}" alt="Preview" style="max-width: 200px; border-radius: 8px; border: 2px solid var(--border-color);">
-        <button type="button" class="btn btn-secondary btn-small" onclick="clearImagePreview()" style="margin-top: 10px; display: block;">Clear Image</button>
-    `;
-}
-
-// Clear Image Preview
-window.clearImagePreview = function() {
-    const preview = document.querySelector('.image-preview');
-    if (preview) {
-        preview.remove();
-    }
-    currentImageData = null;
-    document.getElementById('imageUpload').value = '';
-    document.getElementById('imageUrl').value = '';
-};
 
 // Update SKU Preview
 function updateSKUPreview() {
@@ -346,7 +198,6 @@ function addProduct() {
         stock: parseInt(document.getElementById('stock').value) || 0,
         description: document.getElementById('description').value,
         tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
-        image: currentImageData || null,
         dateAdded: new Date().toISOString()
     };
 
@@ -361,8 +212,6 @@ function addProduct() {
     document.getElementById('productForm').reset();
     document.getElementById('subcategory').disabled = true;
     updateSKUPreview();
-    clearImagePreview();
-    currentImageData = null;
 
     // Update catalog view
     updateCatalogDisplay();
@@ -467,30 +316,23 @@ function updateCatalogDisplay() {
     const tbody = document.getElementById('catalogTableBody');
 
     if (filteredCatalog.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No products found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No products found</td></tr>';
     } else {
-        tbody.innerHTML = filteredCatalog.map(product => {
-            const imageCell = product.image
-                ? `<img src="${product.image}" class="product-image" alt="${product.name}">`
-                : `<div class="product-image-placeholder">No Image</div>`;
-
-            return `
+        tbody.innerHTML = filteredCatalog.map(product => `
             <tr>
-                <td>${imageCell}</td>
                 <td><strong>${product.sku}</strong></td>
                 <td>${product.name}</td>
                 <td>${product.subcategoryName || product.category}</td>
                 <td>${product.material}</td>
                 <td>${product.color}</td>
                 <td>${product.size}</td>
-                <td>₹${product.price.toFixed(2)}</td>
+                <td>$${product.price.toFixed(2)}</td>
                 <td>${product.stock}</td>
                 <td>
                     <button class="btn btn-danger" onclick="deleteProduct('${product.sku}')">Delete</button>
                 </td>
             </tr>
-        `;
-        }).join('');
+        `).join('');
     }
 
     // Update stats
@@ -506,7 +348,7 @@ function updateStats(displayedCatalog = catalog) {
 
     document.getElementById('totalProducts').textContent = totalProducts;
     document.getElementById('totalCategories').textContent = uniqueCategories;
-    document.getElementById('totalValue').textContent = `₹${totalValue.toFixed(2)}`;
+    document.getElementById('totalValue').textContent = `$${totalValue.toFixed(2)}`;
     document.getElementById('lowStock').textContent = lowStock;
 }
 
@@ -526,7 +368,7 @@ function exportToCSV() {
         return;
     }
 
-    const headers = ['SKU', 'Product Name', 'Category', 'Subcategory', 'Material', 'Color', 'Size', 'Price (INR)', 'Stock', 'Description', 'Tags', 'Has Image', 'Date Added'];
+    const headers = ['SKU', 'Product Name', 'Category', 'Subcategory', 'Material', 'Color', 'Size', 'Price', 'Stock', 'Description', 'Tags', 'Date Added'];
 
     const csvContent = [
         headers.join(','),
@@ -542,7 +384,6 @@ function exportToCSV() {
             p.stock,
             `"${p.description}"`,
             `"${p.tags.join(', ')}"`,
-            p.image ? 'Yes' : 'No',
             p.dateAdded
         ].join(','))
     ].join('\n');
@@ -602,8 +443,7 @@ function decodeSKUInput() {
 
     // Find category name
     let categoryName = 'Unknown';
-    const allCategories = getAllCategories();
-    Object.entries(allCategories).forEach(([name, data]) => {
+    Object.entries(catalogData.categories).forEach(([name, data]) => {
         Object.entries(data.subcategories).forEach(([subName, subData]) => {
             if (subData.code === category) {
                 categoryName = `${name} > ${subName}`;
@@ -635,148 +475,6 @@ function decodeSKUInput() {
             <li><strong>Sequence:</strong> ${sequence} (#${parseInt(sequence)})</li>
         </ul>
     `;
-}
-
-// Setup Category Management
-function setupCategoryManagement() {
-    const categoryForm = document.getElementById('categoryForm');
-    const subcategoryForm = document.getElementById('subcategoryForm');
-
-    if (categoryForm) {
-        categoryForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            addNewCategory();
-        });
-    }
-
-    if (subcategoryForm) {
-        subcategoryForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            addNewSubcategory();
-        });
-    }
-}
-
-// Add New Category
-function addNewCategory() {
-    const categoryName = document.getElementById('newCategoryName').value.trim();
-    const categoryCode = document.getElementById('newCategoryCode').value.trim().toUpperCase();
-
-    if (!categoryName || !categoryCode) {
-        alert('Please fill in all fields');
-        return;
-    }
-
-    // Validate code format
-    if (categoryCode.length < 2 || categoryCode.length > 6) {
-        alert('Category code must be 2-6 characters');
-        return;
-    }
-
-    // Check if category already exists
-    const allCategories = getAllCategories();
-    if (allCategories[categoryName]) {
-        alert('Category already exists!');
-        return;
-    }
-
-    // Add new category
-    customCategories[categoryName] = {
-        subcategories: {}
-    };
-
-    saveCustomCategories();
-    populateFormOptions();
-    displayExistingCategories();
-
-    // Reset form
-    document.getElementById('categoryForm').reset();
-
-    alert(`✅ Category "${categoryName}" added successfully!`);
-}
-
-// Add New Subcategory
-function addNewSubcategory() {
-    const parentCategory = document.getElementById('parentCategory').value;
-    const subcategoryName = document.getElementById('newSubcategoryName').value.trim();
-    const subcategoryCode = document.getElementById('newSubcategoryCode').value.trim().toUpperCase();
-
-    if (!parentCategory || !subcategoryName || !subcategoryCode) {
-        alert('Please fill in all fields');
-        return;
-    }
-
-    // Validate code format
-    if (subcategoryCode.length > 8) {
-        alert('Subcategory code must be max 8 characters');
-        return;
-    }
-
-    // Get or create parent category in custom categories
-    if (!customCategories[parentCategory]) {
-        customCategories[parentCategory] = {
-            subcategories: {}
-        };
-    }
-
-    // Check if subcategory already exists
-    const allCategories = getAllCategories();
-    if (allCategories[parentCategory]?.subcategories[subcategoryName]) {
-        alert('Subcategory already exists in this category!');
-        return;
-    }
-
-    // Add subcategory
-    customCategories[parentCategory].subcategories[subcategoryName] = {
-        code: subcategoryCode
-    };
-
-    saveCustomCategories();
-    populateFormOptions();
-    displayExistingCategories();
-
-    // Reset form
-    document.getElementById('subcategoryForm').reset();
-
-    alert(`✅ Subcategory "${subcategoryName}" added to "${parentCategory}" successfully!`);
-}
-
-// Save Custom Categories
-function saveCustomCategories() {
-    localStorage.setItem('customCategories', JSON.stringify(customCategories));
-}
-
-// Display Existing Categories
-function displayExistingCategories() {
-    const container = document.getElementById('existingCategories');
-    if (!container) return;
-
-    const allCategories = getAllCategories();
-
-    if (Object.keys(allCategories).length === 0) {
-        container.innerHTML = '<p class="text-secondary">No categories available</p>';
-        return;
-    }
-
-    container.innerHTML = Object.entries(allCategories).map(([categoryName, categoryData]) => {
-        const subcategoriesHTML = Object.entries(categoryData.subcategories || {})
-            .map(([subName, subData]) => `
-                <li>
-                    <strong>${subName}</strong> - Code: <code>${subData.code}</code>
-                </li>
-            `).join('');
-
-        const isCustom = customCategories[categoryName] ? ' (Custom)' : '';
-
-        return `
-            <div class="category-item">
-                <h4>${categoryName}${isCustom}</h4>
-                <ul class="subcategory-list">
-                    ${subcategoriesHTML || '<li>No subcategories</li>'}
-                </ul>
-            </div>
-        `;
-    }).join('');
 }
 
 // Initial stats update

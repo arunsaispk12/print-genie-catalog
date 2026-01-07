@@ -1,32 +1,39 @@
 {
   "name": "print-genie-catalog",
-  "version": "1.0.0",
-  "description": "3D Printing Catalog Builder and Management System for Print Genie",
+  "version": "1.1.0",
+  "description": "3D Printing Catalog Builder and Management System for Print Genie - Now with INR support, product images, and dynamic category management",
   "main": "src/app.js",
   "type": "module",
   "scripts": {
     "start": "npx http-server -p 8000 -o public/",
     "dev": "npx http-server -p 8000 public/",
-    "serve": "python -m http.server 8000"
+    "serve": "python -m http.server 8000",
+    "api": "json-server --watch db.json --port 3000",
+    "api:delay": "json-server --watch db.json --port 3000 --delay 500"
   },
   "keywords": [
     "catalog",
     "3d-printing",
     "inventory",
     "sku-generator",
-    "product-management"
+    "product-management",
+    "inr",
+    "rupee",
+    "image-upload",
+    "category-management"
   ],
   "author": "Print Genie",
   "license": "UNLICENSED",
   "private": true,
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "json-server": "^0.17.4"
   },
   "engines": {
     "node": ">=14.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/print-genie/catalog"
+    "url": "https://github.com/arunsaispk12/print-genie-catalog"
   }
 }

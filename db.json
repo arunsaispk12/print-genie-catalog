@@ -1,0 +1,163 @@
+{
+  "products": [],
+  "categories": {
+    "Pre-Designed Products - Tech Accessories": {
+      "subcategories": {
+        "Phone Accessories": { "code": "PDTC01" },
+        "Tablet & Laptop Accessories": { "code": "PDTC02" },
+        "Gaming & Console Accessories": { "code": "PDTC03" },
+        "Cable Management": { "code": "PDTC04" },
+        "Audio Accessories": { "code": "PDTC05" }
+      }
+    },
+    "Pre-Designed Products - Home & Living": {
+      "subcategories": {
+        "Organizers & Storage": { "code": "PDHM01" },
+        "Kitchen & Dining": { "code": "PDHM02" },
+        "Bathroom Accessories": { "code": "PDHM03" },
+        "Decorative Items": { "code": "PDHM04" },
+        "Planters & Garden": { "code": "PDHM05" }
+      }
+    },
+    "Pre-Designed Products - Toys & Games": {
+      "subcategories": {
+        "Action Figures & Collectibles": { "code": "PDTY01" },
+        "Educational Toys": { "code": "PDTY02" },
+        "Board Game Accessories": { "code": "PDTY03" },
+        "Puzzles & Brain Teasers": { "code": "PDTY04" },
+        "Miniatures & Models": { "code": "PDTY05" }
+      }
+    },
+    "Pre-Designed Products - Automotive": {
+      "subcategories": {
+        "Interior Accessories": { "code": "PDAT01" },
+        "Phone & Device Mounts": { "code": "PDAT02" },
+        "Organizers": { "code": "PDAT03" },
+        "Tool Holders": { "code": "PDAT04" }
+      }
+    },
+    "Pre-Designed Products - Jewelry & Fashion": {
+      "subcategories": {
+        "Rings": { "code": "PDJW01" },
+        "Pendants & Charms": { "code": "PDJW02" },
+        "Bracelets": { "code": "PDJW03" },
+        "Earrings": { "code": "PDJW04" },
+        "Brooch & Pins": { "code": "PDJW05" }
+      }
+    },
+    "Pre-Designed Products - Office & Stationery": {
+      "subcategories": {
+        "Desk Organizers": { "code": "PDOF01" },
+        "Pen & Pencil Holders": { "code": "PDOF02" },
+        "Business Card Holders": { "code": "PDOF03" },
+        "Cable Management": { "code": "PDOF04" },
+        "Display Stands": { "code": "PDOF05" }
+      }
+    },
+    "Custom Prints": {
+      "subcategories": {
+        "Custom Text/Name": { "code": "CSTM01" },
+        "Custom Logo/Brand": { "code": "CSTM02" },
+        "Personalized Gifts": { "code": "CSTM03" },
+        "Custom Size/Dimension": { "code": "CSTM04" },
+        "Customer Design Files": { "code": "CSTM05" }
+      }
+    },
+    "Prototypes & Samples": {
+      "subcategories": {
+        "Functional Prototypes": { "code": "PROT01" },
+        "Concept Models": { "code": "PROT02" },
+        "Test Parts": { "code": "PROT03" },
+        "Sample Runs": { "code": "PROT04" }
+      }
+    },
+    "Materials & Filaments": {
+      "subcategories": {
+        "PLA Filament": { "code": "MTRL01" },
+        "PLA+ Filament": { "code": "MTRL02" },
+        "PETG Filament": { "code": "MTRL03" },
+        "ABS Filament": { "code": "MTRL04" },
+        "TPU Filament": { "code": "MTRL05" },
+        "Specialty Filaments": { "code": "MTRL06" }
+      }
+    },
+    "Services": {
+      "subcategories": {
+        "Design Service": { "code": "SERV01" },
+        "3D Modeling": { "code": "SERV02" },
+        "STL File Repair": { "code": "SERV03" },
+        "Bulk Order Setup": { "code": "SERV04" }
+      }
+    },
+    "Replacement Parts": {
+      "subcategories": {
+        "Electronics Parts": { "code": "REPL01" },
+        "Household Parts": { "code": "REPL02" },
+        "Automotive Parts": { "code": "REPL03" },
+        "Appliance Parts": { "code": "REPL04" }
+      }
+    }
+  },
+  "materials": {
+    "PLA": { "name": "PLA (Standard)", "description": "Standard biodegradable filament" },
+    "PLP": { "name": "PLA+", "description": "Enhanced PLA with better strength" },
+    "PET": { "name": "PETG", "description": "Durable and chemical resistant" },
+    "ABS": { "name": "ABS", "description": "Strong and heat resistant" },
+    "TPU": { "name": "TPU (Flexible)", "description": "Flexible rubber-like material" },
+    "NLN": { "name": "Nylon", "description": "Very strong and flexible" },
+    "ASA": { "name": "ASA", "description": "UV resistant outdoor material" },
+    "PCC": { "name": "Polycarbonate", "description": "Impact resistant and transparent" },
+    "WOD": { "name": "Wood-filled PLA", "description": "PLA with wood fibers" },
+    "MTL": { "name": "Metal-filled PLA", "description": "PLA with metal particles" },
+    "SLK": { "name": "Silk PLA", "description": "Shiny silk-like finish" },
+    "GWT": { "name": "Glow-in-dark", "description": "Phosphorescent material" }
+  },
+  "colors": {
+    "standard": {
+      "BLK": { "name": "Black", "hex": "#000000" },
+      "WHT": { "name": "White", "hex": "#FFFFFF" },
+      "GRY": { "name": "Gray", "hex": "#808080" },
+      "RED": { "name": "Red", "hex": "#FF0000" },
+      "BLU": { "name": "Blue", "hex": "#0000FF" },
+      "GRN": { "name": "Green", "hex": "#00FF00" },
+      "YLW": { "name": "Yellow", "hex": "#FFFF00" },
+      "ORG": { "name": "Orange", "hex": "#FFA500" },
+      "PRP": { "name": "Purple", "hex": "#800080" },
+      "PNK": { "name": "Pink", "hex": "#FFC0CB" },
+      "BRN": { "name": "Brown", "hex": "#A52A2A" },
+      "BEG": { "name": "Beige", "hex": "#F5F5DC" }
+    },
+    "special": {
+      "TRN": { "name": "Transparent", "hex": "#FFFFFF00" },
+      "SLV": { "name": "Silver", "hex": "#C0C0C0" },
+      "GLD": { "name": "Gold", "hex": "#FFD700" },
+      "CPR": { "name": "Copper", "hex": "#B87333" },
+      "GWT": { "name": "Glow-in-Dark", "hex": "#E0FFE0" },
+      "RNB": { "name": "Rainbow/Multi", "hex": "rainbow" },
+      "MTL": { "name": "Metallic", "hex": "#C0C0C0" }
+    }
+  },
+  "sizes": {
+    "standard": {
+      "XS": { "name": "Extra Small", "range": "< 50mm" },
+      "S": { "name": "Small", "range": "50-100mm" },
+      "M": { "name": "Medium", "range": "100-150mm" },
+      "L": { "name": "Large", "range": "150-200mm" },
+      "XL": { "name": "Extra Large", "range": "200-250mm" },
+      "XXL": { "name": "XX Large", "range": "> 250mm" }
+    },
+    "special": {
+      "MINI": { "name": "Mini/Keychain", "range": "< 30mm" },
+      "STAN": { "name": "Standard/Default", "range": "varies" },
+      "BULK": { "name": "Bulk/Industrial", "range": "varies" },
+      "CUST": { "name": "Custom Size", "range": "specify dimensions" }
+    }
+  },
+  "settings": {
+    "nextSequence": 1,
+    "currency": "INR",
+    "currencySymbol": "₹",
+    "appVersion": "1.1.0",
+    "lastUpdated": "2026-01-08T00:00:00.000Z"
+  }
+}
