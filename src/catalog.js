@@ -106,6 +106,11 @@ function setupEventListeners() {
     // Product modal
     document.getElementById('modalClose').addEventListener('click', closeProductModal);
     document.getElementById('modalOverlay').addEventListener('click', closeProductModal);
+
+    // How to Order modal
+    document.getElementById('howToOrderBtn').addEventListener('click', openHowToOrderModal);
+    document.getElementById('howToOrderClose').addEventListener('click', closeHowToOrderModal);
+    document.getElementById('howToOrderOverlay').addEventListener('click', closeHowToOrderModal);
 }
 
 // Apply filters and search
@@ -439,6 +444,17 @@ function showEmptyState(message) {
         <h3>📦 ${message}</h3>
         <p>Products will appear here once they are added to the catalog.</p>
     `;
+}
+
+// How to Order modal functions
+function openHowToOrderModal() {
+    document.getElementById('howToOrderModal').classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
+
+function closeHowToOrderModal() {
+    document.getElementById('howToOrderModal').classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
 }
 
 // Contact link
