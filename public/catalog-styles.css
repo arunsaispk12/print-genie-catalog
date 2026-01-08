@@ -375,6 +375,18 @@ body {
     color: white;
 }
 
+.btn-instagram {
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-instagram:hover {
+    background: linear-gradient(45deg, #e0832d 0%,#d6583c 25%,#cc1733 50%,#bc1356 75%,#ac0878 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
 /* Modal */
 .modal {
     display: none;

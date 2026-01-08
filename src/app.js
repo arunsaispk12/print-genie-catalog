@@ -680,18 +680,88 @@ async function publishCatalog() {
 }
 
 // Show Share Catalog Dialog
-function showShareCatalogDialog() {
+async function showShareCatalogDialog() {
     if (catalog.length === 0) {
         alert('📦 No products in catalog yet!\n\nAdd some products first, then share your catalog with customers.');
         return;
+    }
+
+    // First, publish the catalog to GitHub (if configured)
+    const githubSettings = getGitHubSettings();
+
+    if (githubSettings) {
+        const confirmPublish = confirm(
+            `📤 Publish & Share Catalog\n\n` +
+            `This will:\n` +
+            `✅ Publish ${catalog.length} products to GitHub\n` +
+            `✅ Update your live catalog\n` +
+            `✅ Generate shareable link\n\n` +
+            `Ready to publish and share?`
+        );
+
+        if (!confirmPublish) return;
+
+        // Create catalog data
+        const catalogData = {
+            products: catalog,
+            lastUpdated: new Date().toISOString(),
+            metadata: {
+                businessName: "Print Genie",
+                currency: "INR",
+                currencySymbol: "₹",
+                totalProducts: catalog.length,
+                categories: Array.from(new Set(catalog.map(p => p.category))),
+                version: "1.1"
+            }
+        };
+
+        // Show loading
+        const shareBtn = document.getElementById('shareCatalogBtn');
+        const originalText = shareBtn ? shareBtn.textContent : '';
+        if (shareBtn) {
+            shareBtn.textContent = '⏳ Publishing...';
+            shareBtn.disabled = true;
+        }
+
+        try {
+            // Publish to GitHub first
+            await publishToGitHub(catalogData);
+
+            alert(
+                `✅ Catalog Published!\n\n` +
+                `📊 ${catalog.length} products are now live\n` +
+                `⏰ Wait 1-2 minutes for deployment\n\n` +
+                `Continuing to share options...`
+            );
+        } catch (error) {
+            console.error('Publish error:', error);
+            alert(
+                `❌ Publishing failed!\n\n` +
+                `Error: ${error.message}\n\n` +
+                `Fix your GitHub settings in the Settings tab and try again.`
+            );
+            if (shareBtn) {
+                shareBtn.textContent = originalText;
+                shareBtn.disabled = false;
+            }
+            return;
+        } finally {
+            if (shareBtn) {
+                shareBtn.textContent = originalText;
+                shareBtn.disabled = false;
+            }
+        }
     }
 
     // Get the public catalog URL - handle both local and GitHub Pages
     let catalogUrl;
     const currentUrl = window.location.href;
 
-    if (currentUrl.includes('index.html')) {
-        // Replace index.html with catalog.html
+    if (currentUrl.includes('admin.html')) {
+        // Replace admin.html with catalog.html
+        catalogUrl = currentUrl.replace('admin.html', 'catalog.html');
+    } else if (currentUrl.includes('index.html')) {
+        // Replace index.html with catalog.html (for backwards compat)
         catalogUrl = currentUrl.replace('index.html', 'catalog.html');
     } else if (currentUrl.endsWith('/public/')) {
         // Add catalog.html to the end
