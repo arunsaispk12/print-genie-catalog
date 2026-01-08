@@ -1185,3 +1185,243 @@ body {
         max-width: 95%;
     }
 }
+
+/* Order Buttons Group */
+.order-buttons-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.order-label {
+    font-weight: 600;
+    color: white;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.btn-whatsapp {
+    background: #25D366;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-whatsapp:hover {
+    background: #1faa52;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Platform Choice Visuals */
+.platform-choice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+.platform-option {
+    flex: 1;
+    min-width: 180px;
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.platform-option:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.platform-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.platform-option:hover .platform-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.whatsapp-icon {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+}
+
+.instagram-icon {
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    color: white;
+}
+
+.platform-option h4 {
+    margin: 10px 0 5px;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.platform-desc {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.platform-badge {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 15px;
+    background: var(--success-color);
+    color: white;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.platform-divider {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    padding: 10px;
+}
+
+/* Trust Section */
+.trust-section {
+    margin: 40px 0;
+    padding: 30px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: 12px;
+    border: 2px solid #f59e0b;
+}
+
+.trust-section h3 {
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+}
+
+.trust-badges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.trust-badge {
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.trust-badge:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.trust-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.trust-badge h4 {
+    color: var(--primary-color);
+    margin: 10px 0 5px;
+    font-size: 1.1rem;
+}
+
+.trust-badge p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Testimonials */
+.testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.testimonial {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.testimonial:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-md);
+}
+
+.testimonial-stars {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #f59e0b;
+}
+
+.testimonial p {
+    color: var(--text-primary);
+    font-style: italic;
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.testimonial-author {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-style: normal !important;
+    margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .order-buttons-group {
+        justify-content: center;
+    }
+
+    .order-label {
+        width: 100%;
+        text-align: center;
+    }
+
+    .platform-choice {
+        flex-direction: column;
+    }
+
+    .platform-divider {
+        transform: rotate(90deg);
+    }
+
+    .trust-badges {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .testimonials {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .trust-badges {
+        grid-template-columns: 1fr;
+    }
+}
