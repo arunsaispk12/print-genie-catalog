@@ -103,19 +103,26 @@
                                        placeholder="0">
                             </div>
 
-                            <!-- Product Image URL -->
-                            <div class="form-group">
-                                <label for="imageUrl">Image URL (Optional)</label>
-                                <input type="url" id="imageUrl"
-                                       placeholder="https://example.com/image.jpg">
-                                <small>Paste image URL or upload below</small>
-                            </div>
+                            <!-- Product Images -->
+                            <div class="form-group full-width">
+                                <label>Product Images (Multiple)</label>
+                                <div class="image-upload-section">
+                                    <div class="image-input-group">
+                                        <input type="url" id="imageUrl"
+                                               placeholder="https://example.com/image.jpg">
+                                        <button type="button" class="btn btn-primary" id="addImageUrl">+ Add URL</button>
+                                    </div>
+                                    <div class="image-input-group">
+                                        <input type="file" id="imageUpload" accept="image/*" multiple>
+                                        <button type="button" class="btn btn-primary" id="addImageUpload">+ Upload</button>
+                                    </div>
+                                    <small>Add multiple images. First image will be the main image. Max 2MB per image.</small>
+                                </div>
 
-                            <!-- Product Image Upload -->
-                            <div class="form-group">
-                                <label for="imageUpload">Upload Image (Optional)</label>
-                                <input type="file" id="imageUpload" accept="image/*">
-                                <small>Max 2MB. Will be stored as base64</small>
+                                <!-- Image Preview Gallery -->
+                                <div class="image-preview-gallery" id="imagePreviewGallery">
+                                    <!-- Image thumbnails will appear here -->
+                                </div>
                             </div>
 
                             <!-- Description -->

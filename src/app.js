@@ -6,7 +6,7 @@ import sampleProducts from './data/sampleProducts.js';
 let catalog = JSON.parse(localStorage.getItem('printGenieCatalog')) || [];
 let nextSequence = parseInt(localStorage.getItem('nextSequence')) || 1;
 let customCategories = JSON.parse(localStorage.getItem('customCategories')) || {};
-let currentImageData = null;
+let currentImages = []; // Array to store multiple images
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -198,102 +198,126 @@ function setupFormHandlers() {
             subcategorySelect.innerHTML = '<option value="">Select category first...</option>';
             updateSKUPreview();
             clearImagePreview();
-            currentImageData = null;
+            currentImages = [];
         }, 0);
     });
 }
 
 // Setup Image Handlers
 function setupImageHandlers() {
-    const imageUpload = document.getElementById('imageUpload');
-    const imageUrl = document.getElementById('imageUrl');
+    const addImageUrlBtn = document.getElementById('addImageUrl');
+    const addImageUploadBtn = document.getElementById('addImageUpload');
 
-    if (imageUpload) {
-        imageUpload.addEventListener('change', handleImageUpload);
+    if (addImageUrlBtn) {
+        addImageUrlBtn.addEventListener('click', addImageFromURL);
     }
 
-    if (imageUrl) {
-        imageUrl.addEventListener('input', handleImageURL);
+    if (addImageUploadBtn) {
+        addImageUploadBtn.addEventListener('click', addImagesFromUpload);
     }
 }
 
-// Handle Image Upload
-function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+// Add Image from URL
+function addImageFromURL() {
+    const urlInput = document.getElementById('imageUrl');
+    const url = urlInput.value.trim();
 
-    // Check file size (2MB limit)
-    if (file.size > 2 * 1024 * 1024) {
-        alert('Image size must be less than 2MB');
-        e.target.value = '';
-        return;
-    }
-
-    // Check file type
-    if (!file.type.startsWith('image/')) {
-        alert('Please select a valid image file');
-        e.target.value = '';
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        currentImageData = event.target.result;
-        displayImagePreview(currentImageData);
-        // Clear URL input if image was uploaded
-        document.getElementById('imageUrl').value = '';
-    };
-    reader.readAsDataURL(file);
-}
-
-// Handle Image URL
-function handleImageURL(e) {
-    const url = e.target.value.trim();
     if (!url) {
-        clearImagePreview();
-        currentImageData = null;
+        alert('Please enter an image URL');
         return;
     }
 
     // Basic URL validation
     try {
         new URL(url);
-        currentImageData = url;
-        displayImagePreview(url);
-        // Clear file input if URL was provided
-        document.getElementById('imageUpload').value = '';
+        currentImages.push(url);
+        displayImageGallery();
+        urlInput.value = '';
     } catch (error) {
-        // Invalid URL, don't show preview yet
-        clearImagePreview();
-        currentImageData = null;
+        alert('Invalid URL. Please enter a valid image URL.');
     }
 }
 
-// Display Image Preview
-function displayImagePreview(imageData) {
-    const form = document.getElementById('productForm');
-    let preview = form.querySelector('.image-preview');
+// Add Images from Upload
+function addImagesFromUpload() {
+    const fileInput = document.getElementById('imageUpload');
+    const files = fileInput.files;
 
-    if (!preview) {
-        preview = document.createElement('div');
-        preview.className = 'image-preview';
-        const imageUrlGroup = form.querySelector('#imageUrl').closest('.form-group');
-        imageUrlGroup.after(preview);
+    if (files.length === 0) {
+        alert('Please select at least one image file');
+        return;
     }
 
-    preview.innerHTML = `
-        <img src="${imageData}" alt="Preview" style="max-width: 200px; border-radius: 8px; border: 2px solid var(--border-color);">
-        <button type="button" class="btn btn-secondary btn-small" onclick="clearImagePreview()" style="margin-top: 10px; display: block;">Clear Image</button>
-    `;
+    let filesProcessed = 0;
+
+    Array.from(files).forEach(file => {
+        // Check file size (2MB limit)
+        if (file.size > 2 * 1024 * 1024) {
+            alert(`${file.name}: Image size must be less than 2MB`);
+            return;
+        }
+
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+            alert(`${file.name}: Please select a valid image file`);
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            currentImages.push(event.target.result);
+            filesProcessed++;
+
+            if (filesProcessed === files.length) {
+                displayImageGallery();
+                fileInput.value = '';
+            }
+        };
+        reader.readAsDataURL(file);
+    });
 }
 
-// Clear Image Preview
+// Display Image Gallery
+function displayImageGallery() {
+    const gallery = document.getElementById('imagePreviewGallery');
+
+    if (currentImages.length === 0) {
+        gallery.innerHTML = '<p style="color: var(--text-secondary);">No images added yet</p>';
+        return;
+    }
+
+    gallery.innerHTML = currentImages.map((image, index) => `
+        <div class="image-thumbnail" data-index="${index}">
+            <img src="${image}" alt="Product image ${index + 1}">
+            <div class="image-actions">
+                ${index === 0 ? '<span class="main-badge">Main</span>' : `<button type="button" class="btn-icon" onclick="setAsMain(${index})" title="Set as main">⭐</button>`}
+                <button type="button" class="btn-icon" onclick="removeImage(${index})" title="Remove">🗑️</button>
+            </div>
+            <div class="image-order">#${index + 1}</div>
+        </div>
+    `).join('');
+}
+
+// Remove Image
+window.removeImage = function(index) {
+    if (confirm('Remove this image?')) {
+        currentImages.splice(index, 1);
+        displayImageGallery();
+    }
+};
+
+// Set as Main Image (move to first position)
+window.setAsMain = function(index) {
+    const image = currentImages[index];
+    currentImages.splice(index, 1);
+    currentImages.unshift(image);
+    displayImageGallery();
+};
+
+// Clear All Images
 window.clearImagePreview = function() {
-    const preview = document.querySelector('.image-preview');
-    if (preview) {
-        preview.remove();
-    }
-    currentImageData = null;
+    currentImages = [];
+    displayImageGallery();
     document.getElementById('imageUpload').value = '';
     document.getElementById('imageUrl').value = '';
 };
@@ -347,7 +371,8 @@ function addProduct() {
         stock: parseInt(document.getElementById('stock').value) || 0,
         description: document.getElementById('description').value,
         tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
-        image: currentImageData || null,
+        images: currentImages.length > 0 ? [...currentImages] : [],
+        image: currentImages.length > 0 ? currentImages[0] : null, // Keep backward compatibility
         dateAdded: new Date().toISOString()
     };
 
@@ -363,7 +388,7 @@ function addProduct() {
     document.getElementById('subcategory').disabled = true;
     updateSKUPreview();
     clearImagePreview();
-    currentImageData = null;
+    currentImages = [];
 
     // Update catalog view
     updateCatalogDisplay();
@@ -372,7 +397,7 @@ function addProduct() {
     document.querySelector('[data-tab="catalog-view"]').click();
 
     // Show success message
-    alert(`✅ Product added successfully!\n\nSKU: ${productData.sku}\nName: ${productData.name}`);
+    alert(`✅ Product added successfully!\n\nSKU: ${productData.sku}\nName: ${productData.name}\nImages: ${productData.images.length}`);
 }
 
 // Generate SKU

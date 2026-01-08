@@ -176,9 +176,34 @@ function displayProducts() {
 
     grid.innerHTML = filteredProducts.map(product => {
         const stockBadge = getStockBadge(product.stock);
-        const imageHTML = product.image
-            ? `<img src="${product.image}" alt="${product.name}">`
-            : `<div class="product-image-placeholder">🧞</div>`;
+
+        // Handle multiple images or fallback to single image
+        const images = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
+
+        let imageHTML;
+        if (images.length === 0) {
+            imageHTML = `<div class="product-image-placeholder">🧞</div>`;
+        } else if (images.length === 1) {
+            imageHTML = `<img src="${images[0]}" alt="${product.name}">`;
+        } else {
+            // Create carousel for multiple images
+            imageHTML = `
+                <div class="product-carousel" data-sku="${product.sku}">
+                    <div class="carousel-images">
+                        ${images.map((img, idx) => `
+                            <img src="${img}" alt="${product.name} - Image ${idx + 1}" class="${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                        `).join('')}
+                    </div>
+                    <button class="carousel-btn prev" onclick="event.stopPropagation(); carouselPrev('${product.sku}')">‹</button>
+                    <button class="carousel-btn next" onclick="event.stopPropagation(); carouselNext('${product.sku}')">›</button>
+                    <div class="carousel-dots">
+                        ${images.map((_, idx) => `
+                            <span class="dot ${idx === 0 ? 'active' : ''}" onclick="event.stopPropagation(); carouselGoTo('${product.sku}', ${idx})"></span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
 
         return `
             <div class="product-card" onclick="showProductDetail('${product.sku}')">
@@ -223,15 +248,47 @@ window.showProductDetail = function(sku) {
     const product = allProducts.find(p => p.sku === sku);
     if (!product) return;
 
-    const imageHTML = product.image
-        ? `<img src="${product.image}" class="product-detail-image" alt="${product.name}">`
-        : `<div class="product-detail-placeholder">🧞</div>`;
+    // Handle multiple images or fallback to single image
+    const images = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
+
+    let imageHTML;
+    if (images.length === 0) {
+        imageHTML = `<div class="product-detail-placeholder">🧞</div>`;
+    } else if (images.length === 1) {
+        imageHTML = `<img src="${images[0]}" class="product-detail-image" alt="${product.name}">`;
+    } else {
+        // Create gallery for multiple images
+        imageHTML = `
+            <div class="detail-image-gallery">
+                <div class="main-image-container">
+                    <img src="${images[0]}" id="mainDetailImage" class="product-detail-image" alt="${product.name}">
+                    <button class="gallery-btn prev" onclick="detailGalleryPrev()">‹</button>
+                    <button class="gallery-btn next" onclick="detailGalleryNext()">›</button>
+                    <div class="image-counter">1 / ${images.length}</div>
+                </div>
+                <div class="thumbnail-strip">
+                    ${images.map((img, idx) => `
+                        <img src="${img}"
+                             class="thumbnail ${idx === 0 ? 'active' : ''}"
+                             alt="${product.name} - ${idx + 1}"
+                             data-index="${idx}"
+                             onclick="selectDetailImage(${idx})">
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
 
     const tagsHTML = product.tags.length > 0
         ? `<div class="product-tags">${product.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>`
         : '';
 
     const modalBody = document.getElementById('modalBody');
+
+    // Store images in modal for gallery navigation
+    modalBody.dataset.images = JSON.stringify(images);
+    modalBody.dataset.currentIndex = '0';
+
     modalBody.innerHTML = `
         <div class="product-detail">
             ${imageHTML}
@@ -470,3 +527,105 @@ if (window.location.pathname === '/' || window.location.pathname === '/index.htm
 
 // Hide admin link from source
 window.__adminUrl = 'public/admin.html'; // Obfuscated admin access
+
+// Carousel control functions
+window.carouselNext = function(sku) {
+    const carousel = document.querySelector(`.product-carousel[data-sku="${sku}"]`);
+    if (!carousel) return;
+
+    const images = carousel.querySelectorAll('.carousel-images img');
+    const dots = carousel.querySelectorAll('.carousel-dots .dot');
+    let currentIndex = 0;
+
+    images.forEach((img, idx) => {
+        if (img.classList.contains('active')) {
+            currentIndex = idx;
+            img.classList.remove('active');
+            dots[idx].classList.remove('active');
+        }
+    });
+
+    const nextIndex = (currentIndex + 1) % images.length;
+    images[nextIndex].classList.add('active');
+    dots[nextIndex].classList.add('active');
+};
+
+window.carouselPrev = function(sku) {
+    const carousel = document.querySelector(`.product-carousel[data-sku="${sku}"]`);
+    if (!carousel) return;
+
+    const images = carousel.querySelectorAll('.carousel-images img');
+    const dots = carousel.querySelectorAll('.carousel-dots .dot');
+    let currentIndex = 0;
+
+    images.forEach((img, idx) => {
+        if (img.classList.contains('active')) {
+            currentIndex = idx;
+            img.classList.remove('active');
+            dots[idx].classList.remove('active');
+        }
+    });
+
+    const prevIndex = (currentIndex - 1 + images.length) % images.length;
+    images[prevIndex].classList.add('active');
+    dots[prevIndex].classList.add('active');
+};
+
+window.carouselGoTo = function(sku, index) {
+    const carousel = document.querySelector(`.product-carousel[data-sku="${sku}"]`);
+    if (!carousel) return;
+
+    const images = carousel.querySelectorAll('.carousel-images img');
+    const dots = carousel.querySelectorAll('.carousel-dots .dot');
+
+    images.forEach((img, idx) => {
+        img.classList.remove('active');
+        dots[idx].classList.remove('active');
+    });
+
+    images[index].classList.add('active');
+    dots[index].classList.add('active');
+};
+
+// Detail modal gallery controls
+window.selectDetailImage = function(index) {
+    const modalBody = document.getElementById('modalBody');
+    const images = JSON.parse(modalBody.dataset.images || '[]');
+
+    if (images.length === 0) return;
+
+    modalBody.dataset.currentIndex = index.toString();
+
+    const mainImage = document.getElementById('mainDetailImage');
+    const thumbnails = document.querySelectorAll('.thumbnail-strip .thumbnail');
+    const counter = document.querySelector('.image-counter');
+
+    if (mainImage) mainImage.src = images[index];
+    if (counter) counter.textContent = `${index + 1} / ${images.length}`;
+
+    thumbnails.forEach((thumb, idx) => {
+        thumb.classList.toggle('active', idx === index);
+    });
+};
+
+window.detailGalleryNext = function() {
+    const modalBody = document.getElementById('modalBody');
+    const images = JSON.parse(modalBody.dataset.images || '[]');
+    const currentIndex = parseInt(modalBody.dataset.currentIndex || '0');
+
+    if (images.length === 0) return;
+
+    const nextIndex = (currentIndex + 1) % images.length;
+    selectDetailImage(nextIndex);
+};
+
+window.detailGalleryPrev = function() {
+    const modalBody = document.getElementById('modalBody');
+    const images = JSON.parse(modalBody.dataset.images || '[]');
+    const currentIndex = parseInt(modalBody.dataset.currentIndex || '0');
+
+    if (images.length === 0) return;
+
+    const prevIndex = (currentIndex - 1 + images.length) % images.length;
+    selectDetailImage(prevIndex);
+};
