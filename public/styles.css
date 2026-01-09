@@ -818,6 +818,173 @@ footer {
     .banner-text p {
         font-size: 0.8rem;
     }
+
+    /* Add Product Form - Mobile Specific */
+    .image-upload-section {
+        flex-direction: column;
+    }
+
+    .image-input-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .image-input-group input[type="url"] {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .image-input-group input[type="file"] {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .image-input-group .btn {
+        width: 100%;
+    }
+
+    .sku-preview {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .sku-preview h3 {
+        font-size: 1.1rem;
+    }
+
+    .sku-display {
+        padding: 12px;
+    }
+
+    .form-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+        margin: 0;
+    }
+
+    /* View Catalog - Mobile Specific */
+    .catalog-header {
+        padding: 15px;
+    }
+
+    .catalog-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .search-input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .filter-select {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    /* Table scroll hint */
+    .table-container {
+        position: relative;
+    }
+
+    .table-container::after {
+        content: '← Scroll to see more →';
+        position: sticky;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background: var(--warning-color);
+        color: white;
+        text-align: center;
+        padding: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        z-index: 10;
+    }
+
+    .catalog-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .catalog-table thead,
+    .catalog-table tbody,
+    .catalog-table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    /* Settings - Mobile Specific */
+    .settings-section {
+        padding: 15px;
+    }
+
+    .setup-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .step {
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .step-number {
+        position: relative;
+        left: 0;
+        top: 0;
+        margin-bottom: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+
+    .step-content {
+        width: 100%;
+    }
+
+    .step-content h4 {
+        font-size: 1.1rem;
+    }
+
+    .step-content ol,
+    .step-content ul {
+        padding-left: 20px;
+        font-size: 0.9rem;
+    }
+
+    .step-content li {
+        margin-bottom: 8px;
+        line-height: 1.5;
+    }
+
+    /* Alerts - Mobile */
+    .alert {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .alert h3,
+    .alert h4 {
+        font-size: 1.1rem;
+    }
+
+    .alert p,
+    .alert li {
+        font-size: 0.9rem;
+    }
+
+    .alert ul {
+        padding-left: 20px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -977,6 +1144,139 @@ footer {
         width: 28px;
         height: 28px;
         font-size: 1rem;
+    }
+
+    /* Add Product - Ultra Mobile */
+    .sku-preview {
+        padding: 12px;
+    }
+
+    .sku-preview h3 {
+        font-size: 1rem;
+    }
+
+    .sku-code {
+        font-size: 0.9rem;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+
+    .sku-breakdown {
+        font-size: 0.7rem;
+        line-height: 1.4;
+    }
+
+    .image-input-group .btn {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+
+    /* View Catalog - Ultra Mobile */
+    .catalog-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .catalog-actions .btn {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .stat-card h3 {
+        font-size: 1.3rem;
+    }
+
+    .stat-card p {
+        font-size: 0.8rem;
+    }
+
+    .table-container::after {
+        font-size: 0.75rem;
+        padding: 6px;
+    }
+
+    /* Settings - Ultra Mobile */
+    .settings-section {
+        padding: 10px;
+    }
+
+    .step {
+        padding: 12px;
+    }
+
+    .step-number {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
+    }
+
+    .step-content h4 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .step-content ol,
+    .step-content ul {
+        font-size: 0.85rem;
+        padding-left: 18px;
+    }
+
+    .step-content li {
+        margin-bottom: 6px;
+    }
+
+    .alert {
+        padding: 12px;
+    }
+
+    .alert h3,
+    .alert h4 {
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+
+    .alert p {
+        font-size: 0.85rem;
+    }
+
+    .alert li {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+    }
+
+    /* Form groups in settings */
+    .settings-section .form-group {
+        margin-bottom: 15px;
+    }
+
+    .settings-section .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .settings-section .form-group input {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    .settings-section .form-group small {
+        font-size: 0.75rem;
+    }
+
+    .settings-section .form-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .settings-section .form-actions .btn {
+        width: 100%;
     }
 }
 
