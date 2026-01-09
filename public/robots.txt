@@ -1,0 +1,32 @@
+# Print Genie - Robots.txt
+# Controls search engine crawler access
+
+# Allow all crawlers to index the public catalog
+User-agent: *
+Allow: /public/catalog.html
+Allow: /public/catalog-data.json
+Allow: /public/catalog-styles.css
+Allow: /public/*.jpg
+Allow: /public/*.png
+Allow: /public/*.webp
+
+# Disallow admin pages and internal files
+Disallow: /public/admin.html
+Disallow: /public/index.html
+Disallow: /public/styles.css
+Disallow: /src/
+
+# Sitemap location
+Sitemap: https://arunsaispk12.github.io/print-genie-catalog/public/sitemap.xml
+
+# Crawl delay (be respectful)
+Crawl-delay: 1
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /public/catalog.html
+Disallow: /public/admin.html
+
+User-agent: Bingbot
+Allow: /public/catalog.html
+Disallow: /public/admin.html
