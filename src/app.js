@@ -554,6 +554,7 @@ function updateCatalogDisplay() {
                 <td>${product.stock}</td>
                 <td>
                     <button class="btn btn-primary btn-small" onclick="editProduct('${product.sku}')" style="margin-right: 5px;">Edit</button>
+                    <button class="btn btn-secondary btn-small" onclick="duplicateProduct('${product.sku}')" style="margin-right: 5px;">Duplicate</button>
                     <button class="btn btn-danger btn-small" onclick="deleteProduct('${product.sku}')">Delete</button>
                 </td>
             </tr>
@@ -661,6 +662,81 @@ window.editProduct = function(sku) {
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// Duplicate Product
+window.duplicateProduct = function(sku) {
+    const product = catalog.find(p => p.sku === sku);
+    if (!product) {
+        alert('Product not found!');
+        return;
+    }
+
+    // Make sure we're NOT in edit mode (this is a new product)
+    editingProductSKU = null;
+
+    // Populate form with product data
+    document.getElementById('productName').value = product.name + ' (Copy)';
+    document.getElementById('category').value = product.category;
+
+    // Trigger category change to load subcategories
+    const categoryEvent = new Event('change');
+    document.getElementById('category').dispatchEvent(categoryEvent);
+
+    // Wait a moment for subcategories to load, then set subcategory
+    setTimeout(() => {
+        document.getElementById('subcategory').value = product.subcategory;
+        document.getElementById('material').value = product.material;
+        document.getElementById('color').value = product.color;
+
+        // Check if size is custom or standard
+        const sizeSelect = document.getElementById('size');
+        const sizeOptions = Array.from(sizeSelect.options).map(opt => opt.value);
+
+        if (sizeOptions.includes(product.size)) {
+            document.getElementById('size').value = product.size;
+            document.getElementById('customSize').value = '';
+        } else {
+            document.getElementById('size').value = '';
+            document.getElementById('customSize').value = product.size;
+        }
+
+        document.getElementById('price').value = product.price;
+        document.getElementById('stock').value = product.stock;
+        document.getElementById('description').value = product.description || '';
+        document.getElementById('tags').value = product.tags.join(', ');
+
+        // Load images (copy the array)
+        currentImages = product.images && product.images.length > 0 ? [...product.images] :
+                       (product.image ? [product.image] : []);
+        displayImageGallery();
+
+        // Update SKU preview (will generate new SKU)
+        updateSKUPreview();
+
+        // Make sure form is in "Add" mode, not "Edit" mode
+        const submitBtn = document.querySelector('#productForm button[type="submit"]');
+        submitBtn.textContent = 'Add Product to Catalog';
+        submitBtn.classList.remove('btn-success');
+        submitBtn.classList.add('btn-primary');
+
+        // Remove cancel button if exists
+        const cancelBtn = document.getElementById('cancelEditBtn');
+        if (cancelBtn) {
+            cancelBtn.remove();
+        }
+    }, 100);
+
+    // Switch to Add Product tab
+    document.querySelector('[data-tab="add-product"]').click();
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Show info message
+    setTimeout(() => {
+        alert('📋 Product duplicated!\n\nModify the details as needed and click "Add Product to Catalog" to create the duplicate.\n\nNote: A new SKU will be generated automatically.');
+    }, 200);
 };
 
 // Cancel Edit Mode
