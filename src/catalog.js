@@ -270,37 +270,52 @@ window.showProductDetail = function(sku) {
     // Handle multiple images or fallback to single image
     const images = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
 
-    let imageHTML;
+    // Image Gallery Section
+    let imageGalleryHTML;
     if (images.length === 0) {
-        imageHTML = `<div class="product-detail-placeholder">🧞</div>`;
-    } else if (images.length === 1) {
-        imageHTML = `<img src="${images[0]}" class="product-detail-image" alt="${product.name}">`;
+        imageGalleryHTML = `<div class="product-detail-placeholder">🧞<br><span>No Image</span></div>`;
     } else {
-        // Create gallery for multiple images
-        imageHTML = `
-            <div class="detail-image-gallery">
-                <div class="main-image-container">
-                    <img src="${images[0]}" id="mainDetailImage" class="product-detail-image" alt="${product.name}">
-                    <button class="gallery-btn prev" onclick="detailGalleryPrev()">‹</button>
-                    <button class="gallery-btn next" onclick="detailGalleryNext()">›</button>
-                    <div class="image-counter">1 / ${images.length}</div>
+        imageGalleryHTML = `
+            <div class="product-detail-gallery">
+                <div class="main-image-wrapper">
+                    <img src="${images[0]}" id="mainDetailImage" class="main-product-image" alt="${product.name}">
+                    ${images.length > 1 ? `
+                        <button class="gallery-nav-btn prev" onclick="detailGalleryPrev()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="gallery-nav-btn next" onclick="detailGalleryNext()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                        <div class="image-indicator">${images.length > 1 ? `1 / ${images.length}` : ''}</div>
+                    ` : ''}
                 </div>
-                <div class="thumbnail-strip">
-                    ${images.map((img, idx) => `
-                        <img src="${img}"
-                             class="thumbnail ${idx === 0 ? 'active' : ''}"
-                             alt="${product.name} - ${idx + 1}"
-                             data-index="${idx}"
-                             onclick="selectDetailImage(${idx})">
-                    `).join('')}
-                </div>
+                ${images.length > 1 ? `
+                    <div class="thumbnail-gallery">
+                        ${images.map((img, idx) => `
+                            <div class="thumbnail-wrapper ${idx === 0 ? 'active' : ''}" data-index="${idx}" onclick="selectDetailImage(${idx})">
+                                <img src="${img}" alt="${product.name} - ${idx + 1}">
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
             </div>
         `;
     }
 
-    const tagsHTML = product.tags.length > 0
-        ? `<div class="product-tags">${product.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>`
-        : '';
+    // Key Highlights
+    const highlights = [];
+    if (product.material) highlights.push(`Made with ${product.material}`);
+    if (product.color) highlights.push(`Available in ${product.color}`);
+    if (product.size) highlights.push(`Size: ${product.size}`);
+    if (product.stock > 10) highlights.push('In Stock - Ships Fast');
+    else if (product.stock > 0 && product.stock <= 10) highlights.push('Limited Stock Available');
+
+    // Create order message for WhatsApp/Instagram
+    const orderMessage = encodeURIComponent(`Hi! I'd like to order:\n\nProduct: ${product.name}\nSKU: ${product.sku}\nPrice: ₹${product.price.toFixed(2)}\n\nPlease confirm availability.`);
 
     const modalBody = document.getElementById('modalBody');
 
@@ -309,71 +324,139 @@ window.showProductDetail = function(sku) {
     modalBody.dataset.currentIndex = '0';
 
     modalBody.innerHTML = `
-        <div class="product-detail">
-            ${imageHTML}
+        <div class="product-detail-container">
+            <!-- Left Column: Image Gallery -->
+            <div class="product-detail-left">
+                ${imageGalleryHTML}
 
-            <div class="detail-section">
-                <h2>${product.name}</h2>
-                <p style="color: var(--text-secondary); font-size: 1.1rem;">${product.subcategoryName || product.category}</p>
-            </div>
-
-            <div class="detail-section">
-                <h3>Product Details</h3>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <label>SKU</label>
-                        <strong>${product.sku}</strong>
-                    </div>
-                    <div class="detail-item">
-                        <label>Price</label>
-                        <strong style="color: var(--primary-color); font-size: 1.5rem;">₹${product.price.toFixed(2)}</strong>
-                    </div>
-                    <div class="detail-item">
-                        <label>Material</label>
-                        <strong>${product.material}</strong>
-                    </div>
-                    <div class="detail-item">
-                        <label>Color</label>
-                        <strong>${product.color}</strong>
-                    </div>
-                    <div class="detail-item">
-                        <label>Size</label>
-                        <strong>${product.size}</strong>
-                    </div>
-                    <div class="detail-item">
-                        <label>Stock</label>
-                        <strong style="color: ${product.stock > 0 ? 'var(--success-color)' : 'var(--danger-color)'};">
-                            ${product.stock > 0 ? `${product.stock} available` : 'Out of stock'}
-                        </strong>
-                    </div>
+                <!-- Order Buttons (Desktop) -->
+                <div class="order-actions desktop-only">
+                    <a href="https://wa.me/919999999999?text=${orderMessage}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="order-btn whatsapp-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                        Order via WhatsApp
+                    </a>
+                    <a href="https://instagram.com/direct/t/?text=${orderMessage}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="order-btn instagram-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                        </svg>
+                        Order via Instagram
+                    </a>
                 </div>
             </div>
 
-            ${product.description ? `
-                <div class="detail-section">
-                    <h3>Description</h3>
-                    <p>${product.description}</p>
+            <!-- Right Column: Product Information -->
+            <div class="product-detail-right">
+                <!-- Product Title & Category -->
+                <div class="product-header">
+                    <h1 class="product-title">${product.name}</h1>
+                    <p class="product-category-tag">${product.subcategoryName || product.category}</p>
                 </div>
-            ` : ''}
 
-            ${tagsHTML ? `
-                <div class="detail-section">
-                    <h3>Tags</h3>
-                    ${tagsHTML}
+                <!-- Price Section -->
+                <div class="price-section">
+                    <div class="price-main">₹${product.price.toFixed(2)}</div>
+                    <div class="stock-badge ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
+                        ${product.stock > 0 ? `✓ ${product.stock} in stock` : '✗ Out of stock'}
+                    </div>
                 </div>
-            ` : ''}
 
-            <div class="detail-section">
-                <h3>Additional Information</h3>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <label>Category</label>
-                        <strong>${product.category}</strong>
+                <!-- Key Highlights -->
+                ${highlights.length > 0 ? `
+                    <div class="highlights-section">
+                        <h3 class="section-title">Key Highlights</h3>
+                        <ul class="highlights-list">
+                            ${highlights.map(h => `<li><span class="check-icon">✓</span> ${h}</li>`).join('')}
+                        </ul>
                     </div>
-                    <div class="detail-item">
-                        <label>Date Added</label>
-                        <strong>${new Date(product.dateAdded).toLocaleDateString()}</strong>
+                ` : ''}
+
+                <!-- Specifications Table -->
+                <div class="specifications-section">
+                    <h3 class="section-title">Product Specifications</h3>
+                    <table class="specs-table">
+                        <tbody>
+                            <tr>
+                                <td class="spec-label">SKU</td>
+                                <td class="spec-value"><code>${product.sku}</code></td>
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Material</td>
+                                <td class="spec-value">${product.material}</td>
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Color</td>
+                                <td class="spec-value">${product.color}</td>
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Size</td>
+                                <td class="spec-value">${product.size}</td>
+                            </tr>
+                            <tr>
+                                <td class="spec-label">Category</td>
+                                <td class="spec-value">${product.category}</td>
+                            </tr>
+                            ${product.subcategoryName ? `
+                                <tr>
+                                    <td class="spec-label">Subcategory</td>
+                                    <td class="spec-value">${product.subcategoryName}</td>
+                                </tr>
+                            ` : ''}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Description -->
+                ${product.description ? `
+                    <div class="description-section">
+                        <h3 class="section-title">Product Description</h3>
+                        <p class="description-text">${product.description}</p>
                     </div>
+                ` : ''}
+
+                <!-- Tags -->
+                ${product.tags.length > 0 ? `
+                    <div class="tags-section">
+                        <h3 class="section-title">Tags</h3>
+                        <div class="product-tags">
+                            ${product.tags.map(tag => `<span class="product-tag">#${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Order Buttons (Mobile) -->
+                <div class="order-actions mobile-only">
+                    <a href="https://wa.me/919999999999?text=${orderMessage}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="order-btn whatsapp-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                        WhatsApp
+                    </a>
+                    <a href="https://instagram.com/direct/t/?text=${orderMessage}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="order-btn instagram-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                        </svg>
+                        Instagram
+                    </a>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="additional-info">
+                    <p class="info-text"><strong>Listed on:</strong> ${new Date(product.dateAdded).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p class="info-text"><strong>Product ID:</strong> ${product.sku}</p>
                 </div>
             </div>
         </div>
@@ -616,14 +699,15 @@ window.selectDetailImage = function(index) {
     modalBody.dataset.currentIndex = index.toString();
 
     const mainImage = document.getElementById('mainDetailImage');
-    const thumbnails = document.querySelectorAll('.thumbnail-strip .thumbnail');
-    const counter = document.querySelector('.image-counter');
+    const thumbnailWrappers = document.querySelectorAll('.thumbnail-gallery .thumbnail-wrapper');
+    const counter = document.querySelector('.image-indicator');
 
     if (mainImage) mainImage.src = images[index];
     if (counter) counter.textContent = `${index + 1} / ${images.length}`;
 
-    thumbnails.forEach((thumb, idx) => {
-        thumb.classList.toggle('active', idx === index);
+    // Update active thumbnail
+    thumbnailWrappers.forEach((wrapper, idx) => {
+        wrapper.classList.toggle('active', idx === index);
     });
 };
 
