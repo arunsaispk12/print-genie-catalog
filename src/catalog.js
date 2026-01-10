@@ -390,10 +390,6 @@ window.showProductDetail = function(sku) {
                     <table class="specs-table">
                         <tbody>
                             <tr>
-                                <td class="spec-label">SKU</td>
-                                <td class="spec-value"><code>${product.sku}</code></td>
-                            </tr>
-                            <tr>
                                 <td class="spec-label">Material</td>
                                 <td class="spec-value">${product.material}</td>
                             </tr>
