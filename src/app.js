@@ -377,6 +377,7 @@ function addProduct() {
         dateAdded: new Date().toISOString()
     };
 
+    let isEdit = false;
     if (editingProductSKU) {
         // Update existing product
         const index = catalog.findIndex(p => p.sku === editingProductSKU);
@@ -387,9 +388,7 @@ function addProduct() {
             productData.dateModified = new Date().toISOString();
 
             catalog[index] = productData;
-
-            // Show success message
-            alert(`✅ Product updated successfully!\n\nSKU: ${productData.sku}\nName: ${productData.name}\nImages: ${productData.images.length}`);
+            isEdit = true;
         }
 
         // Reset edit mode
@@ -399,9 +398,6 @@ function addProduct() {
         catalog.push(productData);
         nextSequence++;
         localStorage.setItem('nextSequence', nextSequence.toString());
-
-        // Show success message
-        alert(`✅ Product added successfully!\n\nSKU: ${productData.sku}\nName: ${productData.name}\nImages: ${productData.images.length}`);
     }
 
     // Save to localStorage
@@ -431,6 +427,40 @@ function addProduct() {
 
     // Switch to catalog view
     document.querySelector('[data-tab="catalog-view"]').click();
+
+    // Show success message with publish reminder
+    setTimeout(() => {
+        const action = isEdit ? 'updated' : 'added';
+        const githubSettings = getGitHubSettings();
+
+        if (githubSettings) {
+            // GitHub is configured - offer to publish now
+            const publishNow = confirm(
+                `✅ Product ${action} successfully!\n\n` +
+                `SKU: ${productData.sku}\n` +
+                `Name: ${productData.name}\n` +
+                `Images: ${productData.images.length}\n\n` +
+                `⚠️ IMPORTANT: Your changes are saved locally but NOT yet published!\n\n` +
+                `Would you like to publish to your live catalog now?\n\n` +
+                `Click OK to publish now, or Cancel to publish later.`
+            );
+
+            if (publishNow) {
+                // Trigger publish
+                document.getElementById('publishCatalogBtn').click();
+            }
+        } else {
+            // No GitHub configured - just inform
+            alert(
+                `✅ Product ${action} successfully!\n\n` +
+                `SKU: ${productData.sku}\n` +
+                `Name: ${productData.name}\n` +
+                `Images: ${productData.images.length}\n\n` +
+                `⚠️ REMINDER: Click "🚀 Publish Catalog" to update your live catalog!\n\n` +
+                `Your changes are saved locally but customers won't see them until you publish.`
+            );
+        }
+    }, 300);
 }
 
 // Generate SKU
@@ -601,10 +631,36 @@ function updateStats(displayedCatalog = catalog) {
 
 // Delete Product
 window.deleteProduct = function(sku) {
-    if (confirm(`Are you sure you want to delete product ${sku}?`)) {
+    const productToDelete = catalog.find(p => p.sku === sku);
+
+    if (confirm(`Are you sure you want to delete product ${sku}?\n\nName: ${productToDelete?.name || 'Unknown'}`)) {
         catalog = catalog.filter(p => p.sku !== sku);
         localStorage.setItem('printGenieCatalog', JSON.stringify(catalog));
         updateCatalogDisplay();
+
+        // Show success with publish reminder
+        setTimeout(() => {
+            const githubSettings = getGitHubSettings();
+
+            if (githubSettings) {
+                const publishNow = confirm(
+                    `✅ Product deleted successfully!\n\n` +
+                    `⚠️ IMPORTANT: Deletion saved locally but NOT yet published!\n\n` +
+                    `Would you like to publish changes to your live catalog now?\n\n` +
+                    `Click OK to publish now, or Cancel to publish later.`
+                );
+
+                if (publishNow) {
+                    document.getElementById('publishCatalogBtn').click();
+                }
+            } else {
+                alert(
+                    `✅ Product deleted successfully!\n\n` +
+                    `⚠️ REMINDER: Click "🚀 Publish Catalog" to update your live catalog!\n\n` +
+                    `The deletion is saved locally but customers will still see it until you publish.`
+                );
+            }
+        }, 200);
     }
 };
 
