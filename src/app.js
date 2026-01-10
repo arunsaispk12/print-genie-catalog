@@ -7,6 +7,7 @@ let catalog = JSON.parse(localStorage.getItem('printGenieCatalog')) || [];
 let nextSequence = parseInt(localStorage.getItem('nextSequence')) || 1;
 let customCategories = JSON.parse(localStorage.getItem('customCategories')) || {};
 let currentImages = []; // Array to store multiple images
+let editingProductSKU = null; // Track which product is being edited
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -356,10 +357,10 @@ function updateSKUPreview() {
     }
 }
 
-// Add Product
+// Add or Update Product
 function addProduct() {
     const productData = {
-        sku: generateSKU(),
+        sku: editingProductSKU || generateSKU(),
         name: document.getElementById('productName').value,
         category: document.getElementById('category').value,
         subcategory: document.getElementById('subcategory').value,
@@ -376,12 +377,35 @@ function addProduct() {
         dateAdded: new Date().toISOString()
     };
 
-    catalog.push(productData);
-    nextSequence++;
+    if (editingProductSKU) {
+        // Update existing product
+        const index = catalog.findIndex(p => p.sku === editingProductSKU);
+        if (index !== -1) {
+            // Keep original dateAdded
+            const originalProduct = catalog[index];
+            productData.dateAdded = originalProduct.dateAdded;
+            productData.dateModified = new Date().toISOString();
+
+            catalog[index] = productData;
+
+            // Show success message
+            alert(`✅ Product updated successfully!\n\nSKU: ${productData.sku}\nName: ${productData.name}\nImages: ${productData.images.length}`);
+        }
+
+        // Reset edit mode
+        editingProductSKU = null;
+    } else {
+        // Add new product
+        catalog.push(productData);
+        nextSequence++;
+        localStorage.setItem('nextSequence', nextSequence.toString());
+
+        // Show success message
+        alert(`✅ Product added successfully!\n\nSKU: ${productData.sku}\nName: ${productData.name}\nImages: ${productData.images.length}`);
+    }
 
     // Save to localStorage
     localStorage.setItem('printGenieCatalog', JSON.stringify(catalog));
-    localStorage.setItem('nextSequence', nextSequence.toString());
 
     // Reset form
     document.getElementById('productForm').reset();
@@ -390,14 +414,23 @@ function addProduct() {
     clearImagePreview();
     currentImages = [];
 
+    // Reset form button
+    const submitBtn = document.querySelector('#productForm button[type="submit"]');
+    submitBtn.textContent = 'Add Product to Catalog';
+    submitBtn.classList.remove('btn-success');
+    submitBtn.classList.add('btn-primary');
+
+    // Remove cancel button if exists
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    if (cancelBtn) {
+        cancelBtn.remove();
+    }
+
     // Update catalog view
     updateCatalogDisplay();
 
     // Switch to catalog view
     document.querySelector('[data-tab="catalog-view"]').click();
-
-    // Show success message
-    alert(`✅ Product added successfully!\n\nSKU: ${productData.sku}\nName: ${productData.name}\nImages: ${productData.images.length}`);
 }
 
 // Generate SKU
@@ -520,7 +553,8 @@ function updateCatalogDisplay() {
                 <td>₹${product.price.toFixed(2)}</td>
                 <td>${product.stock}</td>
                 <td>
-                    <button class="btn btn-danger" onclick="deleteProduct('${product.sku}')">Delete</button>
+                    <button class="btn btn-primary btn-small" onclick="editProduct('${product.sku}')" style="margin-right: 5px;">Edit</button>
+                    <button class="btn btn-danger btn-small" onclick="deleteProduct('${product.sku}')">Delete</button>
                 </td>
             </tr>
         `;
@@ -552,6 +586,106 @@ window.deleteProduct = function(sku) {
         updateCatalogDisplay();
     }
 };
+
+// Edit Product
+window.editProduct = function(sku) {
+    const product = catalog.find(p => p.sku === sku);
+    if (!product) {
+        alert('Product not found!');
+        return;
+    }
+
+    // Set editing mode
+    editingProductSKU = sku;
+
+    // Populate form with product data
+    document.getElementById('productName').value = product.name;
+    document.getElementById('category').value = product.category;
+
+    // Trigger category change to load subcategories
+    const categoryEvent = new Event('change');
+    document.getElementById('category').dispatchEvent(categoryEvent);
+
+    // Wait a moment for subcategories to load, then set subcategory
+    setTimeout(() => {
+        document.getElementById('subcategory').value = product.subcategory;
+        document.getElementById('material').value = product.material;
+        document.getElementById('color').value = product.color;
+
+        // Check if size is custom or standard
+        const sizeSelect = document.getElementById('size');
+        const sizeOptions = Array.from(sizeSelect.options).map(opt => opt.value);
+
+        if (sizeOptions.includes(product.size)) {
+            document.getElementById('size').value = product.size;
+            document.getElementById('customSize').value = '';
+        } else {
+            document.getElementById('size').value = '';
+            document.getElementById('customSize').value = product.size;
+        }
+
+        document.getElementById('price').value = product.price;
+        document.getElementById('stock').value = product.stock;
+        document.getElementById('description').value = product.description || '';
+        document.getElementById('tags').value = product.tags.join(', ');
+
+        // Load images
+        currentImages = product.images && product.images.length > 0 ? [...product.images] :
+                       (product.image ? [product.image] : []);
+        displayImageGallery();
+
+        // Update SKU preview
+        updateSKUPreview();
+
+        // Update form button text
+        const submitBtn = document.querySelector('#productForm button[type="submit"]');
+        submitBtn.textContent = 'Update Product';
+        submitBtn.classList.remove('btn-primary');
+        submitBtn.classList.add('btn-success');
+
+        // Add cancel edit button if not exists
+        let cancelBtn = document.getElementById('cancelEditBtn');
+        if (!cancelBtn) {
+            cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.id = 'cancelEditBtn';
+            cancelBtn.className = 'btn btn-secondary';
+            cancelBtn.textContent = 'Cancel Edit';
+            cancelBtn.onclick = cancelEdit;
+            document.querySelector('.form-actions').insertBefore(cancelBtn, submitBtn);
+        }
+    }, 100);
+
+    // Switch to Add Product tab
+    document.querySelector('[data-tab="add-product"]').click();
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// Cancel Edit Mode
+function cancelEdit() {
+    editingProductSKU = null;
+
+    // Reset form
+    document.getElementById('productForm').reset();
+    document.getElementById('subcategory').disabled = true;
+    updateSKUPreview();
+    clearImagePreview();
+    currentImages = [];
+
+    // Reset button
+    const submitBtn = document.querySelector('#productForm button[type="submit"]');
+    submitBtn.textContent = 'Add Product to Catalog';
+    submitBtn.classList.remove('btn-success');
+    submitBtn.classList.add('btn-primary');
+
+    // Remove cancel button
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    if (cancelBtn) {
+        cancelBtn.remove();
+    }
+}
 
 // Export to CSV
 function exportToCSV() {
@@ -1089,17 +1223,28 @@ function displayExistingCategories() {
 
     container.innerHTML = Object.entries(allCategories).map(([categoryName, categoryData]) => {
         const subcategoriesHTML = Object.entries(categoryData.subcategories || {})
-            .map(([subName, subData]) => `
-                <li>
-                    <strong>${subName}</strong> - Code: <code>${subData.code}</code>
-                </li>
-            `).join('');
+            .map(([subName, subData]) => {
+                const isCustomSub = customCategories[categoryName]?.subcategories?.[subName];
+                const deleteSubBtn = isCustomSub ?
+                    `<button class="btn btn-danger btn-small" style="margin-left: 10px; padding: 4px 8px; font-size: 0.8rem;" onclick="deleteSubcategory('${categoryName}', '${subName}')">Delete</button>` :
+                    '';
+                return `
+                    <li>
+                        <strong>${subName}</strong> - Code: <code>${subData.code}</code>
+                        ${deleteSubBtn}
+                    </li>
+                `;
+            }).join('');
 
-        const isCustom = customCategories[categoryName] ? ' (Custom)' : '';
+        const isCustom = customCategories[categoryName];
+        const customLabel = isCustom ? ' <span style="color: var(--primary-color);">(Custom)</span>' : '';
+        const deleteCategoryBtn = isCustom ?
+            `<button class="btn btn-danger btn-small" style="margin-left: 10px;" onclick="deleteCategory('${categoryName}')">Delete Category</button>` :
+            '';
 
         return `
             <div class="category-item">
-                <h4>${categoryName}${isCustom}</h4>
+                <h4>${categoryName}${customLabel} ${deleteCategoryBtn}</h4>
                 <ul class="subcategory-list">
                     ${subcategoriesHTML || '<li>No subcategories</li>'}
                 </ul>
@@ -1107,6 +1252,67 @@ function displayExistingCategories() {
         `;
     }).join('');
 }
+
+// Delete Custom Category
+window.deleteCategory = function(categoryName) {
+    // Check if any products use this category
+    const productsUsingCategory = catalog.filter(p => p.category === categoryName);
+
+    if (productsUsingCategory.length > 0) {
+        const confirmDelete = confirm(
+            `⚠️ Warning: ${productsUsingCategory.length} product(s) use this category!\n\n` +
+            `Products: ${productsUsingCategory.map(p => p.name).slice(0, 5).join(', ')}${productsUsingCategory.length > 5 ? '...' : ''}\n\n` +
+            `Are you sure you want to delete "${categoryName}"?`
+        );
+
+        if (!confirmDelete) return;
+    } else {
+        if (!confirm(`Delete category "${categoryName}"?`)) return;
+    }
+
+    // Delete from custom categories
+    delete customCategories[categoryName];
+    saveCustomCategories();
+    populateFormOptions();
+    displayExistingCategories();
+
+    alert(`✅ Category "${categoryName}" deleted successfully!`);
+};
+
+// Delete Custom Subcategory
+window.deleteSubcategory = function(categoryName, subcategoryName) {
+    // Check if any products use this subcategory
+    const subcategoryCode = customCategories[categoryName]?.subcategories?.[subcategoryName]?.code;
+    const productsUsingSubcategory = catalog.filter(p => p.subcategory === subcategoryCode);
+
+    if (productsUsingSubcategory.length > 0) {
+        const confirmDelete = confirm(
+            `⚠️ Warning: ${productsUsingSubcategory.length} product(s) use this subcategory!\n\n` +
+            `Products: ${productsUsingSubcategory.map(p => p.name).slice(0, 5).join(', ')}${productsUsingSubcategory.length > 5 ? '...' : ''}\n\n` +
+            `Are you sure you want to delete "${subcategoryName}"?`
+        );
+
+        if (!confirmDelete) return;
+    } else {
+        if (!confirm(`Delete subcategory "${subcategoryName}" from "${categoryName}"?`)) return;
+    }
+
+    // Delete subcategory
+    if (customCategories[categoryName]?.subcategories?.[subcategoryName]) {
+        delete customCategories[categoryName].subcategories[subcategoryName];
+
+        // If category has no more subcategories, remove it
+        if (Object.keys(customCategories[categoryName].subcategories).length === 0) {
+            delete customCategories[categoryName];
+        }
+
+        saveCustomCategories();
+        populateFormOptions();
+        displayExistingCategories();
+
+        alert(`✅ Subcategory "${subcategoryName}" deleted successfully!`);
+    }
+};
 
 // Setup Settings
 function setupSettings() {
