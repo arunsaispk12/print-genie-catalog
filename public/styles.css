@@ -598,6 +598,10 @@ footer {
     /* Container */
     .container {
         padding: 10px;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        box-sizing: border-box;
     }
 
     /* Header */
@@ -644,14 +648,20 @@ footer {
     .card {
         padding: 20px;
         margin-bottom: 15px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
     }
 
     .card h2 {
         font-size: 1.5rem;
+        word-wrap: break-word;
     }
 
     .card h3 {
         font-size: 1.2rem;
+        word-wrap: break-word;
     }
 
     /* Forms */
@@ -660,8 +670,16 @@ footer {
         gap: 15px;
     }
 
+    .form-group {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
     .form-group label {
         font-size: 0.95rem;
+        display: block;
+        width: 100%;
     }
 
     .form-group input,
@@ -669,10 +687,25 @@ footer {
     .form-group textarea {
         font-size: 1rem;
         padding: 12px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        border: 1px solid var(--border-color);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="url"],
+    .form-group input[type="password"] {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .form-group small {
         font-size: 0.8rem;
+        display: block;
+        width: 100%;
     }
 
     /* Buttons */
@@ -822,25 +855,36 @@ footer {
     /* Add Product Form - Mobile Specific */
     .image-upload-section {
         flex-direction: column;
+        width: 100%;
+        max-width: 100%;
     }
 
     .image-input-group {
         flex-direction: column;
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .image-input-group input[type="url"] {
         width: 100%;
+        max-width: 100%;
         margin-bottom: 8px;
+        box-sizing: border-box;
+        padding: 12px;
     }
 
     .image-input-group input[type="file"] {
         width: 100%;
+        max-width: 100%;
         margin-bottom: 8px;
+        box-sizing: border-box;
     }
 
     .image-input-group .btn {
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .sku-preview {
@@ -879,12 +923,18 @@ footer {
 
     .search-input {
         width: 100%;
+        max-width: 100%;
         margin-bottom: 10px;
+        box-sizing: border-box;
+        padding: 12px;
     }
 
     .filter-select {
         width: 100%;
+        max-width: 100%;
         margin-bottom: 10px;
+        box-sizing: border-box;
+        padding: 12px;
     }
 
     /* Table scroll hint */
@@ -1017,12 +1067,32 @@ footer {
         font-size: 1.1rem;
     }
 
+    /* Container */
+    .container {
+        padding: 8px;
+        overflow-x: hidden;
+    }
+
+    /* Cards */
+    .card {
+        padding: 15px;
+        overflow-x: hidden;
+    }
+
     /* Forms */
+    .form-group {
+        width: 100%;
+        max-width: 100%;
+    }
+
     .form-group input,
     .form-group select,
     .form-group textarea {
         font-size: 0.95rem;
         padding: 10px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     /* Buttons */
@@ -1255,19 +1325,28 @@ footer {
     /* Form groups in settings */
     .settings-section .form-group {
         margin-bottom: 15px;
+        width: 100%;
+        max-width: 100%;
     }
 
     .settings-section .form-group label {
         font-size: 0.9rem;
+        display: block;
+        width: 100%;
     }
 
     .settings-section .form-group input {
         font-size: 0.9rem;
         padding: 10px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .settings-section .form-group small {
         font-size: 0.75rem;
+        display: block;
+        width: 100%;
     }
 
     .settings-section .form-actions {
