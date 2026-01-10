@@ -115,19 +115,38 @@ function setupEventListeners() {
 
 // Apply filters and search
 function applyFilters() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     const categoryFilter = document.getElementById('categoryFilter').value;
     const sortBy = document.getElementById('sortBy').value;
 
-    // Filter products
+    // Filter products with improved search
     filteredProducts = allProducts.filter(product => {
-        const matchesSearch = !searchTerm ||
-            product.name.toLowerCase().includes(searchTerm) ||
-            product.sku.toLowerCase().includes(searchTerm) ||
-            product.description.toLowerCase().includes(searchTerm) ||
-            product.tags.some(tag => tag.toLowerCase().includes(searchTerm));
-
+        // Category filter
         const matchesCategory = !categoryFilter || product.category === categoryFilter;
+
+        // If no search term, just apply category filter
+        if (!searchTerm) {
+            return matchesCategory;
+        }
+
+        // Split search term into words for multi-word search
+        const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
+
+        // Create searchable text from all product fields
+        const searchableText = [
+            product.name || '',
+            product.sku || '',
+            product.category || '',
+            product.subcategoryName || '',
+            product.material || '',
+            product.color || '',
+            product.size || '',
+            product.description || '',
+            ...(product.tags || [])
+        ].join(' ').toLowerCase();
+
+        // Check if all search words are found in the searchable text
+        const matchesSearch = searchWords.every(word => searchableText.includes(word));
 
         return matchesSearch && matchesCategory;
     });
