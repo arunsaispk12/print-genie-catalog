@@ -176,6 +176,65 @@ header h1 {
     font-size: 0.875rem;
 }
 
+/* Image Recommendations Box */
+.image-recommendations {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border-left: 4px solid var(--primary-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.image-recommendations p {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.image-recommendations ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.image-recommendations li {
+    padding: 6px 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.image-recommendations li::before {
+    content: "✓";
+    color: var(--success-color);
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+.image-recommendations strong {
+    color: var(--primary-color);
+}
+
+/* Highlights Info Box */
+.highlights-info {
+    background: var(--light-bg);
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.highlights-info small {
+    color: var(--text-secondary);
+    display: block;
+    line-height: 1.5;
+}
+
+/* Character Counter */
+#descCharCount {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
 /* SKU Preview */
 .sku-preview {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

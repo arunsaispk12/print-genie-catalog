@@ -200,8 +200,37 @@ function setupFormHandlers() {
             updateSKUPreview();
             clearImagePreview();
             currentImages = [];
+            updateDescriptionCharCount();
         }, 0);
     });
+
+    // Character counter for description
+    const descriptionField = document.getElementById('description');
+    if (descriptionField) {
+        descriptionField.addEventListener('input', updateDescriptionCharCount);
+        updateDescriptionCharCount(); // Initialize counter
+    }
+}
+
+// Update description character count
+function updateDescriptionCharCount() {
+    const descriptionField = document.getElementById('description');
+    const charCountSpan = document.getElementById('descCharCount');
+
+    if (descriptionField && charCountSpan) {
+        const currentLength = descriptionField.value.length;
+        const maxLength = descriptionField.getAttribute('maxlength') || 500;
+        charCountSpan.textContent = currentLength;
+
+        // Change color based on usage
+        if (currentLength > maxLength * 0.9) {
+            charCountSpan.style.color = 'var(--danger-color)';
+        } else if (currentLength > maxLength * 0.7) {
+            charCountSpan.style.color = 'var(--warning-color)';
+        } else {
+            charCountSpan.style.color = 'var(--primary-color)';
+        }
+    }
 }
 
 // Setup Image Handlers
@@ -359,6 +388,12 @@ function updateSKUPreview() {
 
 // Add or Update Product
 function addProduct() {
+    // Parse highlights from textarea (one per line)
+    const highlightsText = document.getElementById('highlights').value.trim();
+    const highlights = highlightsText
+        ? highlightsText.split('\n').map(h => h.trim()).filter(h => h.length > 0)
+        : [];
+
     const productData = {
         sku: editingProductSKU || generateSKU(),
         name: document.getElementById('productName').value,
@@ -371,6 +406,7 @@ function addProduct() {
         price: parseFloat(document.getElementById('price').value),
         stock: parseInt(document.getElementById('stock').value) || 0,
         description: document.getElementById('description').value,
+        highlights: highlights,
         tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
         images: currentImages.length > 0 ? [...currentImages] : [],
         image: currentImages.length > 0 ? currentImages[0] : null, // Keep backward compatibility
@@ -706,10 +742,19 @@ window.editProduct = function(sku) {
         document.getElementById('description').value = product.description || '';
         document.getElementById('tags').value = product.tags.join(', ');
 
+        // Load highlights (one per line)
+        const highlightsValue = product.highlights && product.highlights.length > 0
+            ? product.highlights.join('\n')
+            : '';
+        document.getElementById('highlights').value = highlightsValue;
+
         // Load images
         currentImages = product.images && product.images.length > 0 ? [...product.images] :
                        (product.image ? [product.image] : []);
         displayImageGallery();
+
+        // Update character count
+        updateDescriptionCharCount();
 
         // Update SKU preview
         updateSKUPreview();
@@ -782,10 +827,19 @@ window.duplicateProduct = function(sku) {
         document.getElementById('description').value = product.description || '';
         document.getElementById('tags').value = product.tags.join(', ');
 
+        // Load highlights (one per line)
+        const highlightsValue = product.highlights && product.highlights.length > 0
+            ? product.highlights.join('\n')
+            : '';
+        document.getElementById('highlights').value = highlightsValue;
+
         // Load images (copy the array)
         currentImages = product.images && product.images.length > 0 ? [...product.images] :
                        (product.image ? [product.image] : []);
         displayImageGallery();
+
+        // Update character count
+        updateDescriptionCharCount();
 
         // Update SKU preview (will generate new SKU)
         updateSKUPreview();

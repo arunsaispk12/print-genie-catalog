@@ -146,6 +146,18 @@
                             <!-- Product Images -->
                             <div class="form-group full-width">
                                 <label>Product Images (Multiple)</label>
+                                <div class="image-recommendations">
+                                    <p><strong>📸 Recommended Image Specifications:</strong></p>
+                                    <ul>
+                                        <li><strong>Aspect Ratio:</strong> Square (1:1) - 800x800px or 1000x1000px</li>
+                                        <li><strong>Minimum Size:</strong> 500x500px for good quality</li>
+                                        <li><strong>Maximum Size:</strong> 2000x2000px (to keep file sizes reasonable)</li>
+                                        <li><strong>File Format:</strong> JPG, PNG, or WebP</li>
+                                        <li><strong>File Size:</strong> Max 2MB per image</li>
+                                        <li><strong>Background:</strong> White or transparent for product photos</li>
+                                        <li><strong>Tip:</strong> First image is the main display image</li>
+                                    </ul>
+                                </div>
                                 <div class="image-upload-section">
                                     <div class="image-input-group">
                                         <input type="url" id="imageUrl"
@@ -168,8 +180,20 @@
                             <!-- Description -->
                             <div class="form-group full-width">
                                 <label for="description">Product Description</label>
-                                <textarea id="description" rows="4"
+                                <textarea id="description" rows="4" maxlength="500"
                                           placeholder="Detailed product description, features, and specifications..."></textarea>
+                                <small><span id="descCharCount">0</span>/500 characters</small>
+                            </div>
+
+                            <!-- Key Highlights -->
+                            <div class="form-group full-width">
+                                <label for="highlights">Key Highlights (One per line)</label>
+                                <div class="highlights-info">
+                                    <small>💡 These will appear as bullet points on the product page. Add 3-5 key features that make this product special.</small>
+                                </div>
+                                <textarea id="highlights" rows="5"
+                                          placeholder="Example:&#10;Made with premium PLA material&#10;Perfect for desk organization&#10;Durable and long-lasting&#10;Easy to clean and maintain&#10;Ships within 24 hours"></textarea>
+                                <small>Enter each highlight on a new line. These will appear with checkmark icons on the product page.</small>
                             </div>
 
                             <!-- Tags -->
@@ -177,6 +201,7 @@
                                 <label for="tags">Tags (comma-separated)</label>
                                 <input type="text" id="tags"
                                        placeholder="e.g., desk, organizer, office, modern">
+                                <small>Tags help customers find your products through search</small>
                             </div>
                         </div>
 

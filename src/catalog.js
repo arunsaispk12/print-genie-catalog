@@ -306,13 +306,19 @@ window.showProductDetail = function(sku) {
         `;
     }
 
-    // Key Highlights
-    const highlights = [];
-    if (product.material) highlights.push(`Made with ${product.material}`);
-    if (product.color) highlights.push(`Available in ${product.color}`);
-    if (product.size) highlights.push(`Size: ${product.size}`);
-    if (product.stock > 10) highlights.push('In Stock - Ships Fast');
-    else if (product.stock > 0 && product.stock <= 10) highlights.push('Limited Stock Available');
+    // Key Highlights - Use custom highlights if available, otherwise auto-generate
+    let highlights = [];
+    if (product.highlights && product.highlights.length > 0) {
+        // Use custom highlights from admin
+        highlights = product.highlights;
+    } else {
+        // Auto-generate highlights from product data
+        if (product.material) highlights.push(`Made with ${product.material}`);
+        if (product.color) highlights.push(`Available in ${product.color}`);
+        if (product.size) highlights.push(`Size: ${product.size}`);
+        if (product.stock > 10) highlights.push('In Stock - Ships Fast');
+        else if (product.stock > 0 && product.stock <= 10) highlights.push('Limited Stock Available');
+    }
 
     // Create order message for WhatsApp/Instagram
     const orderMessage = encodeURIComponent(`Hi! I'd like to order:\n\nProduct: ${product.name}\nSKU: ${product.sku}\nPrice: ₹${product.price.toFixed(2)}\n\nPlease confirm availability.`);
