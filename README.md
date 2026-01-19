@@ -1,14 +1,17 @@
-# 🧞 Print Genie - 3D Printing Catalog System
+# Print Genie - 3D Printing Catalog System
 
-A comprehensive catalog builder and management system for Print Genie's 3D printing business. This system includes category structures, SKU generation, product naming conventions, and a web-based catalog builder.
+A comprehensive catalog builder and management system for Print Genie's 3D printing business. This system includes category structures, SKU generation, product naming conventions, price calculator, and a web-based catalog builder.
 
-## 🌐 Live Demo
+**Current Version:** v1.2.0 | [View Changelog](CHANGELOG.md)
 
-**Try it now:** https://arunsaispk12.github.io/print-genie-catalog/public/
+## Live Demo
+
+- **Public Catalog:** https://arunsaispk12.github.io/print-genie-catalog/public/catalog.html
+- **Admin Panel:** https://arunsaispk12.github.io/print-genie-catalog/public/admin.html
 
 The catalog builder is hosted on GitHub Pages and ready to use!
 
-## 📋 Project Overview
+## Project Overview
 
 Print Genie offers four main product types:
 - **Custom Prints** - Made-to-order from customer designs
@@ -16,25 +19,27 @@ Print Genie offers four main product types:
 - **Prototyping Services** - Professional prototyping and iteration
 - **Materials & Filaments** - 3D printing supplies and accessories
 
-## 🚀 Quick Start
+## Quick Start
 
-### Option 1: Run Locally (Simple)
-1. Clone this repository
-2. Open `public/index.html` in your web browser
-3. Start adding products!
+### Option 1: Use Live Version
+Visit the [Admin Panel](https://arunsaispk12.github.io/print-genie-catalog/public/admin.html) directly.
 
-### Option 2: Run with Local Server
+### Option 2: Run Locally
 ```bash
+# Clone repository
+git clone https://github.com/arunsaispk12/print-genie-catalog.git
+cd print-genie-catalog
+
 # Using Python
 python -m http.server 8000
 
-# Using Node.js (http-server)
+# Using Node.js
 npx http-server
 
-# Then visit: http://localhost:8000/public/
+# Visit: http://localhost:8000/public/admin.html
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 print-genie-catalog/
@@ -44,27 +49,45 @@ print-genie-catalog/
 │   └── PRODUCT_NAMING_GUIDE.md    # Product naming conventions
 ├── src/
 │   ├── data/
-│   │   └── catalogData.js         # Category, material, color, size data
+│   │   ├── catalogData.js         # Category, material, color, size data
+│   │   └── sampleProducts.js      # Sample product data
 │   ├── app.js                     # Main application logic
-│   └── components/                # Future: React components
+│   ├── calculator.js              # Price calculator module (v1.2.0)
+│   └── pricing-modes.js           # Pricing configuration (v1.2.0)
 ├── public/
-│   ├── index.html                 # Catalog builder web interface
+│   ├── admin.html                 # Admin panel interface
+│   ├── catalog.html               # Public catalog page
+│   ├── product.html               # Product detail page
+│   ├── catalog-data.json          # Published catalog data
 │   └── styles.css                 # Application styling
-└── README.md
+├── CHANGELOG.md                   # Version history
+├── README.md                      # This file
+└── [other docs]                   # Feature guides and setup docs
 ```
 
-## 🎯 Features
+## Features
 
-### Web Catalog Builder
+### v1.2.0 - Price Calculator (NEW)
+- **Retail/Bulk Pricing Modes** - Different margins for customer types
+- **Cost Breakdown** - Material, electricity, depreciation, maintenance, labor
+- **Volume Discounts** - 5% (25+), 10% (50+), 15% (100+ units) for bulk
+- **5 Export Options** - PDF, WhatsApp, Email, CSV, Image (1080x1080)
+- **Configurable Costs** - All printer costs editable in Settings tab
+
+### Core Features
 - **Add Products** - Intuitive form with automatic SKU generation
+- **Product Images** - Upload or paste URL with live preview
 - **View Catalog** - Searchable, filterable product table
+- **Category Management** - Create custom categories without code
 - **SKU Generator** - Quick SKU generation and decoder tool
+- **Auto-Publish** - One-click GitHub Pages publishing
 - **Export** - Export catalog to CSV
-- **Local Storage** - Automatic data persistence
+- **INR Currency** - All prices in Indian Rupees
 
 ### Category System
 - 11 major categories
 - 50+ subcategories
+- Dynamic category creation
 - Comprehensive product coverage
 
 ### SKU System
@@ -78,176 +101,132 @@ print-genie-catalog/
 - `M` - Medium size
 - `0001` - Sequential number
 
-### Product Naming Convention
-**Format:** `[Function] - [Feature] - [Material] ([Size])`
+## Admin Panel Tabs
 
-**Example:** `Phone Stand - Adjustable Angle - PLA (Medium)`
+| Tab | Description |
+|-----|-------------|
+| **Add Product** | Create new products with auto SKU |
+| **View Catalog** | Browse, search, edit, delete products |
+| **Manage Categories** | Add custom categories/subcategories |
+| **SKU Generator** | Quick SKU tools and decoder |
+| **Calculator** | Price calculator with exports (v1.2.0) |
+| **Settings** | GitHub auto-publish + Cost settings |
+| **Documentation** | Quick reference guide |
 
-## 📖 Documentation
+## Price Calculator Usage
+
+1. Navigate to **Calculator** tab
+2. Select pricing mode: **Retail** or **Bulk**
+3. Enter print details:
+   - Weight (grams)
+   - Print time (hours)
+   - Material
+   - Complexity tier
+   - Quantity
+4. Click **Calculate Price**
+5. View cost breakdown (bulk mode)
+6. Export quote: PDF, WhatsApp, Email, CSV, or Image
+
+### Pricing Modes
+
+| Mode | Min Qty | Profit Margins | Labor | Volume Discounts |
+|------|---------|----------------|-------|------------------|
+| Retail | 1 | 25-35% | 100% | None |
+| Bulk | 10 | 15-20% | 80% | 5-15% |
+
+## Documentation
 
 ### Core Documents
-1. **[CATEGORY_STRUCTURE.md](docs/CATEGORY_STRUCTURE.md)**
-   - Complete category hierarchy
-   - All subcategories and codes
-   - Usage guidelines
+- [CATEGORY_STRUCTURE.md](docs/CATEGORY_STRUCTURE.md) - Category hierarchy
+- [SKU_SYSTEM.md](docs/SKU_SYSTEM.md) - SKU format specification
+- [PRODUCT_NAMING_GUIDE.md](docs/PRODUCT_NAMING_GUIDE.md) - Naming conventions
 
-2. **[SKU_SYSTEM.md](docs/SKU_SYSTEM.md)**
-   - SKU format specification
-   - Material codes (17 types)
-   - Color codes (27 options)
-   - Size codes
-   - Validation checklist
+### Setup & Guides
+- [QUICK_START.md](QUICK_START.md) - Getting started guide
+- [AUTO_PUBLISH_SETUP.md](AUTO_PUBLISH_SETUP.md) - GitHub auto-publish setup
+- [HOW_TO_PUBLISH.md](HOW_TO_PUBLISH.md) - Publishing workflow
+- [SEO-GUIDE.md](SEO-GUIDE.md) - SEO optimization tips
 
-3. **[PRODUCT_NAMING_GUIDE.md](docs/PRODUCT_NAMING_GUIDE.md)**
-   - Naming formulas
-   - Category-specific guidelines
-   - SEO best practices
-   - Examples and templates
+### Release Notes
+- [CHANGELOG.md](CHANGELOG.md) - Complete version history
+- [FEATURES_UPDATE_v1.1.md](FEATURES_UPDATE_v1.1.md) - v1.1.0 details
 
-## 🛠️ Using the Catalog Builder
+## Data Storage
 
-### Adding a Product
+### LocalStorage Keys
+| Key | Purpose |
+|-----|---------|
+| `printGenieCatalog` | Product catalog array |
+| `nextSequence` | Next SKU sequence number |
+| `customCategories` | User-created categories |
+| `githubSettings` | Auto-publish credentials |
+| `printerCostSettings` | Calculator cost config (v1.2.0) |
 
-1. **Navigate to "Add Product" tab**
-2. **Fill in product details:**
-   - Product name (follow naming guide)
-   - Select category and subcategory
-   - Choose material, color, size
-   - Enter price and stock
-   - Add description and tags
+### Export Options
+- **CSV** - Spreadsheet format for catalog
+- **JSON** - Full catalog data (via publish)
+- **PDF** - Price quotes (Calculator)
+- **Image** - Instagram-ready quotes (Calculator)
 
-3. **SKU auto-generates** as you fill the form
-4. **Click "Add Product"** - Done!
+## Customization
 
-### Viewing Your Catalog
-
-1. **Navigate to "View Catalog" tab**
-2. **Use search** to find products
-3. **Filter by category** for focused view
-4. **Export to CSV** for external use
-
-### SKU Tools
-
-**Generator:** Quickly create SKUs with custom codes
-
-**Decoder:** Paste any SKU to see its breakdown and meaning
-
-## 🎨 Customization
-
-### Adding New Categories
+### Adding Materials/Colors/Sizes
 Edit `src/data/catalogData.js`:
 ```javascript
-"New Category": {
-  code: "NC",
-  subcategories: {
-    "Subcategory 1": { code: "NC01" }
-  }
+materials: {
+  "NEW": { name: "New Material", description: "..." }
 }
 ```
 
-### Adding Materials/Colors/Sizes
-Add to respective sections in `catalogData.js`
+### Modifying Cost Defaults
+Edit `src/pricing-modes.js`:
+```javascript
+export const defaultCostSettings = {
+  electricity: { rate: 8, consumption: 0.2 },
+  // ...
+};
+```
 
 ### Styling
-Modify `public/styles.css` - CSS variables in `:root` for easy theming
+Modify `public/styles.css` - CSS variables in `:root` for easy theming.
 
-## 💾 Data Storage
+## Browser Support
 
-Products are stored in browser's `localStorage`:
-- **Key:** `printGenieCatalog`
-- **Format:** JSON array
-- **Persistence:** Survives browser refresh
-- **Export:** Use "Export CSV" to backup
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-**Note:** Clear browser data = lost products. Export regularly!
+## Version History
 
-## 🔄 Export/Import
+| Version | Date | Highlights |
+|---------|------|------------|
+| v1.2.0 | 2026-01-19 | Price Calculator, Cost Settings, Quote Exports |
+| v1.1.0 | 2026-01-08 | INR currency, Images, Category management, Auto-publish |
+| v1.0.0 | 2026-01-07 | Initial release, SKU system, Basic catalog |
 
-### Export
-1. Go to "View Catalog"
-2. Click "Export CSV"
-3. Save file: `print-genie-catalog-YYYY-MM-DD.csv`
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-### Import (Manual)
-Currently manual import via form. Future: CSV import feature.
-
-## 📊 Example Products
-
-### Phone Stand
-```
-Name: Phone Stand - Adjustable Angle - PLA (Medium)
-SKU: PG-PDTC01-PLA-BLK-M-0001
-Category: Pre-Designed: Tech & Gadgets > Phone & Tablet
-Material: PLA
-Color: Black
-Size: Medium
-```
-
-### Custom Prototype
-```
-Name: Custom Prototype - ProjectXYZ - ABS
-SKU: PG-CP03-ABS-GRY-L-0002
-Category: Custom Prints > Prototypes
-Material: ABS
-Color: Gray
-Size: Large
-```
-
-### PLA Filament
-```
-Name: PLA+ Filament - Premium - Galaxy Blue - 1kg
-SKU: PG-MFFT01-PLP-BLU-KG1-0003
-Category: Materials > Filaments by Type > PLA
-Material: PLA+ (Enhanced)
-Color: Blue
-Size: 1 KG
-```
-
-## 🚧 Future Enhancements
-
-- [ ] Backend API integration
-- [ ] Multi-user support
-- [ ] Image uploads
-- [ ] Inventory tracking
-- [ ] Order management
-- [ ] Analytics dashboard
-- [ ] Barcode generation
-- [ ] CSV import functionality
-- [ ] Product variants management
-- [ ] Pricing tiers
-
-## 🤝 Contributing
-
-This is a business-specific catalog system. For modifications:
+## Contributing
 
 1. Update documentation in `/docs` first
 2. Modify data structures in `catalogData.js`
 3. Update UI as needed
 4. Test thoroughly
-5. Commit changes with clear messages
+5. Update CHANGELOG.md
+6. Commit with clear messages
 
-## 📝 Version History
-
-- **v1.0.0** (2026-01-07)
-  - Initial release
-  - Complete category structure
-  - SKU system
-  - Product naming guide
-  - Web-based catalog builder
-  - Export to CSV
-
-## 📄 License
+## License
 
 Proprietary - Print Genie Internal Use
 
-## 🆘 Support
+## Support
 
 For issues or questions:
 1. Check documentation in `/docs`
-2. Review examples in this README
+2. Review [CHANGELOG.md](CHANGELOG.md) for recent changes
 3. Contact Print Genie development team
 
 ---
 
-**Built for Print Genie** 🧞
-*Turning digital designs into physical reality*
+**Built for Print Genie** | *Turning digital designs into physical reality*
