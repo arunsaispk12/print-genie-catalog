@@ -1,6 +1,7 @@
-// Print Genie Catalog Builder - Main Application v1.1.0
+// Print Genie Catalog Builder - Main Application v1.2.0
 import catalogData from './data/catalogData.js';
 import sampleProducts from './data/sampleProducts.js';
+import { initializeCalculator } from './calculator.js';
 
 // Application State
 let catalog = JSON.parse(localStorage.getItem('printGenieCatalog')) || [];
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupImageHandlers();
     setupCategoryManagement();
     setupSettings();
+    initializeCalculator(); // Initialize Price Calculator
     updateCatalogDisplay();
     displayExistingCategories();
 });

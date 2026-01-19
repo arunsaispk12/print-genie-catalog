@@ -2239,3 +2239,488 @@ input[type="file"]:hover {
         height: 120px;
     }
 }
+
+/* ============================================
+   CALCULATOR TAB STYLES
+   ============================================ */
+
+/* Pricing Mode Selector */
+.pricing-mode-selector {
+    margin-bottom: 30px;
+}
+
+.mode-toggle-container {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.mode-toggle-btn {
+    flex: 1;
+    min-width: 200px;
+    padding: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.mode-toggle-btn:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+}
+
+.mode-toggle-btn.active {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    box-shadow: var(--shadow-md);
+}
+
+.mode-toggle-btn .mode-icon {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.mode-toggle-btn .mode-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.mode-toggle-btn.active .mode-icon {
+    color: var(--primary-color);
+}
+
+.mode-toggle-btn.active .mode-label {
+    color: var(--text-primary);
+}
+
+/* Calculator Form Section */
+.calculator-form-section {
+    margin-bottom: 25px;
+}
+
+/* Minimum Quantity Warning */
+.min-qty-warning {
+    padding: 15px 20px;
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.min-qty-warning .warning-icon {
+    background: #f59e0b;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+/* Volume Discount Info Panel */
+.volume-discount-info {
+    padding: 20px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 2px solid var(--success-color);
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.volume-discount-info h4 {
+    color: var(--success-color);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.discount-tiers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.discount-tier {
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.discount-tier .tier-range {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.discount-tier .tier-discount {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--success-color);
+    font-weight: 500;
+}
+
+/* Calculator Results Section */
+.calculator-results {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid var(--border-color);
+}
+
+.calculator-results h3 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+/* Price Result Card */
+.price-result-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--shadow-md);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.result-item-name {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.result-mode-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.result-mode-badge.retail {
+    background: var(--primary-color);
+    color: white;
+}
+
+.result-mode-badge.bulk {
+    background: var(--success-color);
+    color: white;
+}
+
+/* Cost Breakdown */
+.cost-breakdown {
+    background: var(--light-bg);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.cost-breakdown h4 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.breakdown-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.breakdown-item:last-child {
+    border-bottom: none;
+}
+
+.breakdown-item.breakdown-total {
+    border-top: 2px solid var(--border-color);
+    border-bottom: none;
+    padding-top: 12px;
+    margin-top: 5px;
+}
+
+.breakdown-label {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.breakdown-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.breakdown-total .breakdown-label,
+.breakdown-total .breakdown-value {
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+/* Pricing Summary */
+.pricing-summary {
+    margin-bottom: 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.summary-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.discount-row {
+    background: rgba(16, 185, 129, 0.1);
+    margin: 0 -25px;
+    padding: 12px 25px;
+    border-bottom: none;
+}
+
+.discount-value {
+    color: var(--success-color);
+}
+
+.final-row {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 10px -25px -25px -25px;
+    padding: 20px 25px;
+    border-radius: 0 0 13px 13px;
+}
+
+.final-row .summary-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+}
+
+.final-row .summary-value {
+    color: white;
+    font-size: 1.5rem;
+}
+
+/* Result Info */
+.result-info {
+    padding: 15px;
+    background: var(--light-bg);
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.result-info p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.result-info strong {
+    color: var(--text-primary);
+}
+
+/* Export Section */
+.export-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: var(--light-bg);
+    border-radius: 12px;
+}
+
+.export-section h4 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+
+.export-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.export-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.export-btn:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.export-btn .export-icon {
+    font-size: 0.85rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 4px;
+}
+
+.export-btn:hover .export-icon {
+    background: white;
+    color: var(--primary-color);
+}
+
+/* Cost Settings Group */
+.cost-settings-group {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--light-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.cost-settings-group h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Material Costs Grid */
+.material-costs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.material-cost-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.material-cost-item label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.material-cost-item input {
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.material-cost-item input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Responsive Calculator Styles */
+@media (max-width: 768px) {
+    .mode-toggle-container {
+        flex-direction: column;
+    }
+
+    .mode-toggle-btn {
+        min-width: 100%;
+    }
+
+    .discount-tiers {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .result-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .export-buttons {
+        justify-content: center;
+    }
+
+    .export-btn {
+        flex: 1;
+        min-width: 140px;
+        justify-content: center;
+    }
+
+    .material-costs-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .final-row {
+        margin: 10px -20px -20px -20px;
+        padding: 15px 20px;
+    }
+
+    .discount-row {
+        margin: 0 -20px;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .discount-tiers {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .discount-tier {
+        padding: 10px;
+    }
+
+    .export-btn {
+        min-width: 100%;
+    }
+
+    .material-costs-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .result-item-name {
+        font-size: 1.2rem;
+    }
+
+    .final-row .summary-value {
+        font-size: 1.3rem;
+    }
+}

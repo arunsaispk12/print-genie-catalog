@@ -62,6 +62,7 @@
                 <button class="tab-button" data-tab="catalog-view">View Catalog</button>
                 <button class="tab-button" data-tab="category-manager">Manage Categories</button>
                 <button class="tab-button" data-tab="sku-generator">SKU Generator</button>
+                <button class="tab-button" data-tab="calculator">Calculator</button>
                 <button class="tab-button" data-tab="settings">⚙️ Settings</button>
                 <button class="tab-button" data-tab="documentation">Documentation</button>
             </div>
@@ -395,6 +396,243 @@
                 </div>
             </div>
 
+            <!-- Calculator Tab -->
+            <div id="calculator" class="tab-content">
+                <div class="card">
+                    <h2>Price Calculator</h2>
+                    <p class="subtitle" style="margin-bottom: 20px;">Calculate accurate pricing for your 3D prints with full cost breakdown</p>
+
+                    <!-- Customer Type Toggle -->
+                    <div class="pricing-mode-selector">
+                        <div class="mode-toggle-container">
+                            <button type="button" class="mode-toggle-btn active" data-mode="retail">
+                                <span class="mode-icon">Retail</span>
+                                <span class="mode-label">Individual customers</span>
+                            </button>
+                            <button type="button" class="mode-toggle-btn" data-mode="bulk">
+                                <span class="mode-icon">Bulk</span>
+                                <span class="mode-label">Wholesale orders</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Calculator Form -->
+                    <div class="calculator-form-section">
+                        <form id="calculatorForm">
+                            <div class="form-grid">
+                                <!-- Item Name (Optional) -->
+                                <div class="form-group full-width">
+                                    <label for="calcItemName">Item Name (Optional - for quote)</label>
+                                    <input type="text" id="calcItemName" placeholder="e.g., Custom Phone Stand">
+                                </div>
+
+                                <!-- Print Weight -->
+                                <div class="form-group">
+                                    <label for="calcWeight">Print Weight (grams) *</label>
+                                    <input type="number" id="calcWeight" min="1" step="1" required placeholder="e.g., 50">
+                                    <small>Total weight of the printed part</small>
+                                </div>
+
+                                <!-- Print Time -->
+                                <div class="form-group">
+                                    <label for="calcTime">Print Time (hours) *</label>
+                                    <input type="number" id="calcTime" min="0.1" step="0.1" required placeholder="e.g., 2.5">
+                                    <small>Estimated print duration</small>
+                                </div>
+
+                                <!-- Material -->
+                                <div class="form-group">
+                                    <label for="calcMaterial">Material *</label>
+                                    <select id="calcMaterial" required>
+                                        <option value="">Select material...</option>
+                                        <option value="PLA">PLA</option>
+                                        <option value="PLA+">PLA+</option>
+                                        <option value="PETG">PETG</option>
+                                        <option value="ABS">ABS</option>
+                                        <option value="TPU">TPU (Flexible)</option>
+                                        <option value="Nylon">Nylon</option>
+                                        <option value="Polycarbonate">Polycarbonate</option>
+                                        <option value="ASA">ASA</option>
+                                        <option value="Wood-Fill">Wood-Fill</option>
+                                        <option value="Metal-Fill">Metal-Fill</option>
+                                        <option value="Carbon Fiber">Carbon Fiber</option>
+                                        <option value="Silk PLA">Silk PLA</option>
+                                        <option value="Glow PLA">Glow PLA</option>
+                                        <option value="Multi-Color">Multi-Color</option>
+                                    </select>
+                                </div>
+
+                                <!-- Complexity Tier -->
+                                <div class="form-group">
+                                    <label for="calcComplexity">Complexity Tier *</label>
+                                    <select id="calcComplexity" required>
+                                        <option value="">Select complexity...</option>
+                                        <option value="tier1">Small (under 50g, simple)</option>
+                                        <option value="tier2">Medium (50-150g, standard)</option>
+                                        <option value="tier3">Large (150-300g, detailed)</option>
+                                        <option value="tier4">Complex (300g+, intricate)</option>
+                                    </select>
+                                    <small>Based on print difficulty</small>
+                                </div>
+
+                                <!-- Quantity -->
+                                <div class="form-group">
+                                    <label for="calcQuantity">Quantity *</label>
+                                    <input type="number" id="calcQuantity" min="1" value="1" required>
+                                    <small>Number of units to produce</small>
+                                </div>
+
+                                <!-- Description (Optional) -->
+                                <div class="form-group full-width">
+                                    <label for="calcDescription">Notes (Optional - for quote)</label>
+                                    <textarea id="calcDescription" rows="2" placeholder="Additional notes or specifications..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-primary" id="calculatePriceBtn">Calculate Price</button>
+                                <button type="reset" class="btn btn-secondary">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Minimum Quantity Warning (Bulk Mode) -->
+                    <div class="min-qty-warning" id="minQtyWarning" style="display: none;">
+                        <span class="warning-icon">Warning</span>
+                        <span>Bulk pricing requires minimum 10 units. Current quantity is below minimum.</span>
+                    </div>
+
+                    <!-- Volume Discount Info (Bulk Mode) -->
+                    <div class="volume-discount-info" id="volumeDiscountInfo" style="display: none;">
+                        <h4>Volume Discounts Available</h4>
+                        <div class="discount-tiers">
+                            <div class="discount-tier">
+                                <span class="tier-range">10-24 units</span>
+                                <span class="tier-discount">Base price</span>
+                            </div>
+                            <div class="discount-tier">
+                                <span class="tier-range">25-49 units</span>
+                                <span class="tier-discount">5% off</span>
+                            </div>
+                            <div class="discount-tier">
+                                <span class="tier-range">50-99 units</span>
+                                <span class="tier-discount">10% off</span>
+                            </div>
+                            <div class="discount-tier">
+                                <span class="tier-range">100+ units</span>
+                                <span class="tier-discount">15% off</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div class="calculator-results" id="calculatorResults" style="display: none;">
+                        <h3>Price Calculation Results</h3>
+
+                        <!-- Price Result Card -->
+                        <div class="price-result-card" id="priceResultCard">
+                            <div class="result-header">
+                                <span class="result-item-name" id="resultItemName">Custom Print</span>
+                                <span class="result-mode-badge" id="resultModeBadge">Retail</span>
+                            </div>
+
+                            <!-- Cost Breakdown (Bulk Only) -->
+                            <div class="cost-breakdown" id="costBreakdown" style="display: none;">
+                                <h4>Cost Breakdown</h4>
+                                <div class="breakdown-grid">
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Material Cost</span>
+                                        <span class="breakdown-value" id="materialCostValue">-</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Electricity Cost</span>
+                                        <span class="breakdown-value" id="electricityCostValue">-</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Depreciation Cost</span>
+                                        <span class="breakdown-value" id="depreciationCostValue">-</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Maintenance Cost</span>
+                                        <span class="breakdown-value" id="maintenanceCostValue">-</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Labor Cost</span>
+                                        <span class="breakdown-value" id="laborCostValue">-</span>
+                                    </div>
+                                    <div class="breakdown-item breakdown-total">
+                                        <span class="breakdown-label">Total Production Cost</span>
+                                        <span class="breakdown-value" id="totalCostValue">-</span>
+                                    </div>
+                                    <div class="breakdown-item">
+                                        <span class="breakdown-label">Profit Margin (<span id="profitMarginPercent">-</span>%)</span>
+                                        <span class="breakdown-value" id="profitAmountValue">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Summary -->
+                            <div class="pricing-summary">
+                                <div class="summary-row">
+                                    <span class="summary-label">Unit Price</span>
+                                    <span class="summary-value" id="unitPriceValue">-</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Quantity</span>
+                                    <span class="summary-value" id="quantityValue">-</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Subtotal</span>
+                                    <span class="summary-value" id="subtotalValue">-</span>
+                                </div>
+                                <div class="summary-row discount-row" id="discountRow" style="display: none;">
+                                    <span class="summary-label">Volume Discount (<span id="discountPercent">-</span>%)</span>
+                                    <span class="summary-value discount-value" id="discountValue">-</span>
+                                </div>
+                                <div class="summary-row final-row">
+                                    <span class="summary-label">Final Total</span>
+                                    <span class="summary-value final-value" id="finalTotalValue">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Additional Info -->
+                            <div class="result-info">
+                                <p><strong>Material:</strong> <span id="resultMaterial">-</span></p>
+                                <p><strong>Complexity:</strong> <span id="resultComplexity">-</span></p>
+                                <p><strong>Print Time:</strong> <span id="resultPrintTime">-</span> hours</p>
+                            </div>
+                        </div>
+
+                        <!-- Export Section -->
+                        <div class="export-section">
+                            <h4>Export Quote</h4>
+                            <div class="export-buttons">
+                                <button type="button" class="btn export-btn" id="exportPdfBtn">
+                                    <span class="export-icon">PDF</span>
+                                    Export PDF
+                                </button>
+                                <button type="button" class="btn export-btn" id="exportWhatsappBtn">
+                                    <span class="export-icon">WhatsApp</span>
+                                    WhatsApp
+                                </button>
+                                <button type="button" class="btn export-btn" id="exportEmailBtn">
+                                    <span class="export-icon">Email</span>
+                                    Email
+                                </button>
+                                <button type="button" class="btn export-btn" id="exportCsvBtn">
+                                    <span class="export-icon">CSV</span>
+                                    CSV
+                                </button>
+                                <button type="button" class="btn export-btn" id="exportImageBtn">
+                                    <span class="export-icon">IMG</span>
+                                    Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Settings Tab -->
             <div id="settings" class="tab-content">
                 <div class="card">
@@ -486,9 +724,158 @@
                         </div>
 
                         <div class="alert alert-success" style="display: none;" id="autoPublishInfo">
-                            <h4>✅ Auto-Publish Enabled!</h4>
-                            <p>When you click "🚀 Publish Catalog" in the View Catalog tab, your products will automatically update on GitHub without any manual commands!</p>
+                            <h4>Auto-Publish Enabled!</h4>
+                            <p>When you click "Publish Catalog" in the View Catalog tab, your products will automatically update on GitHub without any manual commands!</p>
                         </div>
+                    </div>
+
+                    <!-- Printer Cost Settings Section -->
+                    <div class="settings-section" style="margin-top: 40px;">
+                        <h3>Printer Cost Settings</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">Configure your printer operating costs for accurate price calculations</p>
+
+                        <form id="printerCostForm">
+                            <!-- Electricity Costs -->
+                            <div class="cost-settings-group">
+                                <h4>Electricity Costs</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="electricityRate">Electricity Rate (per unit)</label>
+                                        <input type="number" id="electricityRate" step="0.1" min="0" value="8" placeholder="8">
+                                        <small>Cost per kWh in your area</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="printerConsumption">Printer Consumption (kW)</label>
+                                        <input type="number" id="printerConsumption" step="0.01" min="0" value="0.2" placeholder="0.2">
+                                        <small>Average power draw during printing</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Depreciation Costs -->
+                            <div class="cost-settings-group">
+                                <h4>Depreciation Costs</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="printerCost">Printer Purchase Price</label>
+                                        <input type="number" id="printerCost" step="100" min="0" value="25000" placeholder="25000">
+                                        <small>Total cost of your printer</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="printerLifespan">Expected Lifespan (hours)</label>
+                                        <input type="number" id="printerLifespan" step="100" min="100" value="5000" placeholder="5000">
+                                        <small>Total print hours before replacement</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Maintenance Costs -->
+                            <div class="cost-settings-group">
+                                <h4>Maintenance Costs</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="maintenanceBudget">Monthly Maintenance Budget</label>
+                                        <input type="number" id="maintenanceBudget" step="50" min="0" value="500" placeholder="500">
+                                        <small>Parts, nozzles, belts, etc.</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="monthlyPrintHours">Monthly Print Hours</label>
+                                        <input type="number" id="monthlyPrintHours" step="10" min="1" value="100" placeholder="100">
+                                        <small>Estimated printing hours per month</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Labor Rates -->
+                            <div class="cost-settings-group">
+                                <h4>Labor Rates</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="setupRate">Setup Cost (per print)</label>
+                                        <input type="number" id="setupRate" step="5" min="0" value="50" placeholder="50">
+                                        <small>Bed prep, slicing, file transfer</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="monitoringRate">Monitoring Rate (per hour)</label>
+                                        <input type="number" id="monitoringRate" step="5" min="0" value="20" placeholder="20">
+                                        <small>Print supervision cost</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="postProcessingRate">Post-Processing Rate (per hour)</label>
+                                        <input type="number" id="postProcessingRate" step="5" min="0" value="30" placeholder="30">
+                                        <small>Support removal, sanding, finishing</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Material Costs -->
+                            <div class="cost-settings-group">
+                                <h4>Material Costs (per kg)</h4>
+                                <div class="material-costs-grid" id="materialCostsGrid">
+                                    <div class="material-cost-item">
+                                        <label>PLA</label>
+                                        <input type="number" class="material-cost-input" data-material="PLA" value="800" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>PLA+</label>
+                                        <input type="number" class="material-cost-input" data-material="PLA+" value="1000" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>PETG</label>
+                                        <input type="number" class="material-cost-input" data-material="PETG" value="1200" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>ABS</label>
+                                        <input type="number" class="material-cost-input" data-material="ABS" value="900" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>TPU</label>
+                                        <input type="number" class="material-cost-input" data-material="TPU" value="2000" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>Nylon</label>
+                                        <input type="number" class="material-cost-input" data-material="Nylon" value="2500" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>Polycarbonate</label>
+                                        <input type="number" class="material-cost-input" data-material="Polycarbonate" value="3000" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>ASA</label>
+                                        <input type="number" class="material-cost-input" data-material="ASA" value="1500" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>Wood-Fill</label>
+                                        <input type="number" class="material-cost-input" data-material="Wood-Fill" value="1800" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>Metal-Fill</label>
+                                        <input type="number" class="material-cost-input" data-material="Metal-Fill" value="3500" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>Carbon Fiber</label>
+                                        <input type="number" class="material-cost-input" data-material="Carbon Fiber" value="4000" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>Silk PLA</label>
+                                        <input type="number" class="material-cost-input" data-material="Silk PLA" value="1200" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>Glow PLA</label>
+                                        <input type="number" class="material-cost-input" data-material="Glow PLA" value="1500" min="0">
+                                    </div>
+                                    <div class="material-cost-item">
+                                        <label>Multi-Color</label>
+                                        <input type="number" class="material-cost-input" data-material="Multi-Color" value="1600" min="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions" style="margin-top: 20px;">
+                                <button type="submit" class="btn btn-primary">Save Cost Settings</button>
+                                <button type="button" class="btn btn-secondary" id="resetCostSettingsBtn">Reset to Defaults</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -563,6 +950,8 @@
         </footer>
     </div>
 
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script type="module" src="../src/app.js"></script>
 </body>
 </html>
