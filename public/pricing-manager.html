@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Genie - Pricing Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Pricing Manager Specific Styles */
+        .pricing-app {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .pricing-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .pricing-header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .pricing-header p {
+            opacity: 0.9;
+        }
+
+        .pricing-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .pricing-tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .pricing-tab-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        .pricing-tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pricing-tab-content {
+            display: none;
+        }
+
+        .pricing-tab-content.active {
+            display: block;
+        }
+
+        /* Quote Generator Styles */
+        .quote-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .quote-input-section, .quote-preview-section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header h3 {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mode-btn {
+            padding: 6px 16px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .mode-btn.wholesale.active {
+            background: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        /* Live Preview Card */
+        .live-preview-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f1ff 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-mode-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .preview-mode-badge.retail {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .preview-mode-badge.wholesale {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .preview-specs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .preview-spec {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .preview-spec-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .preview-spec-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-pricing {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .preview-row:last-child {
+            border-bottom: none;
+        }
+
+        .preview-row.discount {
+            color: var(--success-color);
+        }
+
+        .preview-row.total {
+            border-top: 2px solid var(--primary-color);
+            margin-top: 10px;
+            padding-top: 12px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .preview-row.total .preview-value {
+            color: var(--primary-color);
+        }
+
+        /* Export Buttons */
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .export-btn .icon {
+            font-weight: bold;
+        }
+
+        /* Material Prices Tab */
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .material-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .material-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .material-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .material-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .material-price-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .material-price-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .material-unit {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Settings Tab */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .settings-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .setting-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .setting-input {
+            width: 120px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Volume Tiers Display */
+        .volume-tiers-list {
+            margin-top: 15px;
+        }
+
+        .volume-tier-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: var(--light-bg);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .tier-range {
+            font-weight: 500;
+        }
+
+        .tier-discount {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        /* Quick Calculator */
+        .quick-calc {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .calc-result-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .calc-result-label {
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .calc-result-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .calc-result-card.wholesale {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .comparison-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table tr:hover {
+            background: var(--light-bg);
+        }
+
+        .savings-badge {
+            background: var(--success-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pricing-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .quote-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-specs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .pricing-tab-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pricing-app">
+        <!-- Header -->
+        <div class="pricing-header">
+            <h1>Print Genie Pricing Manager</h1>
+            <p>Calculate prices, generate quotes, and manage your pricing strategy</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="pricing-tabs">
+            <button class="pricing-tab-btn active" data-tab="quote-generator">Generate Quote</button>
+            <button class="pricing-tab-btn" data-tab="material-prices">Material Prices</button>
+            <button class="pricing-tab-btn" data-tab="settings">Settings</button>
+            <button class="pricing-tab-btn" data-tab="calculator">Quick Calculator</button>
+        </div>
+
+        <!-- Quote Generator Tab -->
+        <div id="quote-generator" class="pricing-tab-content active">
+            <div class="quote-form-grid">
+                <!-- Input Section -->
+                <div class="quote-input-section">
+                    <div class="section-header">
+                        <h3>Print Details</h3>
+                        <div class="mode-switch">
+                            <button class="mode-btn active" data-mode="retail">Retail</button>
+                            <button class="mode-btn wholesale" data-mode="wholesale">Wholesale</button>
+                        </div>
+                    </div>
+
+                    <form id="quoteForm">
+                        <div class="form-group">
+                            <label for="itemName">Item Name</label>
+                            <input type="text" id="itemName" placeholder="e.g., Custom Phone Stand">
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="printWeight">Weight (grams) *</label>
+                                <input type="number" id="printWeight" min="1" value="75" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="printTime">Print Time (hours) *</label>
+                                <input type="number" id="printTime" min="0.1" step="0.1" value="2.8" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="materialSelect">Material *</label>
+                                <select id="materialSelect" required>
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="complexitySelect">Complexity *</label>
+                                <select id="complexitySelect" required>
+                                    <option value="simple">Simple</option>
+                                    <option value="moderate" selected>Moderate</option>
+                                    <option value="complex">Complex</option>
+                                    <option value="very-complex">Very Complex</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="quantity">Quantity *</label>
+                                <input type="number" id="quantity" min="1" value="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="rushOrder">Delivery Speed</label>
+                                <select id="rushOrder">
+                                    <option value="standard">Standard (5-7 days)</option>
+                                    <option value="express">Express (2-3 days, +20%)</option>
+                                    <option value="rush">Rush (24 hours, +40%)</option>
+                                    <option value="same-day">Same Day (+75%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postProcessing">Post-Processing</label>
+                            <select id="postProcessing" multiple size="4">
+                                <option value="none" selected>None</option>
+                                <option value="support-removal">Support Removal (+₹20)</option>
+                                <option value="sanding">Sanding & Smoothing (+₹50)</option>
+                                <option value="painting">Painting (+₹100)</option>
+                                <option value="assembly">Assembly (+₹75)</option>
+                                <option value="full-finish">Full Finishing (+₹200)</option>
+                            </select>
+                            <small>Hold Ctrl/Cmd to select multiple</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="customerName">Customer Name (Optional)</label>
+                            <input type="text" id="customerName" placeholder="For quote personalization">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="quote-preview-section">
+                    <div class="section-header">
+                        <h3>Live Preview</h3>
+                        <span class="preview-mode-badge retail" id="previewBadge">Retail</span>
+                    </div>
+
+                    <div class="live-preview-card">
+                        <div class="preview-header">
+                            <span class="preview-title" id="previewItemName">Custom 3D Print</span>
+                        </div>
+
+                        <div class="preview-specs">
+                            <div class="preview-spec">
+                                <div class="preview-spec-label">Material</div>
+                                <div class="preview-spec-value" id="previewMaterial">PLA</div>
+                            </div>
+                            <div class="preview-spec">
+                                <div class="preview-spec-label">Weight</div>
+                                <div class="preview-spec-value" id="previewWeight">75g</div>
+                            </div>
+                            <div class="preview-spec">
+                                <div class="preview-spec-label">Time</div>
+                                <div class="preview-spec-value" id="previewTime">2.8 hrs</div>
+                            </div>
+                        </div>
+
+                        <div class="preview-pricing">
+                            <div class="preview-row">
+                                <span>Unit Price</span>
+                                <span class="preview-value" id="previewUnitPrice">₹0.00</span>
+                            </div>
+                            <div class="preview-row">
+                                <span>Quantity</span>
+                                <span class="preview-value" id="previewQuantity">× 1</span>
+                            </div>
+                            <div class="preview-row" id="previewDiscountRow" style="display: none;">
+                                <span>Volume Discount</span>
+                                <span class="preview-value discount" id="previewDiscount">-₹0.00</span>
+                            </div>
+                            <div class="preview-row" id="previewRushRow" style="display: none;">
+                                <span>Rush Premium</span>
+                                <span class="preview-value" id="previewRush">+₹0.00</span>
+                            </div>
+                            <div class="preview-row total">
+                                <span>Total</span>
+                                <span class="preview-value" id="previewTotal">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Profit Indicator (for admin view) -->
+                        <div style="margin-top: 15px; padding: 10px; background: #f0fdf4; border-radius: 8px; text-align: center;">
+                            <small style="color: #6b7280;">Profit Margin</small>
+                            <div style="font-weight: bold; color: #10b981;" id="previewMargin">45%</div>
+                        </div>
+                    </div>
+
+                    <!-- Export Actions -->
+                    <div class="export-actions">
+                        <button class="export-btn" id="exportPdf">
+                            <span class="icon">PDF</span> Download
+                        </button>
+                        <button class="export-btn" id="exportWhatsapp">
+                            <span class="icon">WA</span> WhatsApp
+                        </button>
+                        <button class="export-btn" id="exportEmail">
+                            <span class="icon">@</span> Email
+                        </button>
+                        <button class="export-btn" id="exportHtml">
+                            <span class="icon">HTML</span> View
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Material Prices Tab -->
+        <div id="material-prices" class="pricing-tab-content">
+            <div class="card">
+                <div class="section-header">
+                    <h3>Material Costs (per kg)</h3>
+                    <button class="btn btn-secondary" id="resetMaterials">Reset to Defaults</button>
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Update prices to match your current supplier costs. Changes save automatically.
+                </p>
+                <div class="materials-grid" id="materialsGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="pricing-tab-content">
+            <div class="settings-grid">
+                <!-- Electricity Settings -->
+                <div class="settings-card">
+                    <h4>Electricity Costs</h4>
+                    <div class="setting-row">
+                        <span class="setting-label">Rate per hour</span>
+                        <input type="number" class="setting-input" id="electricityRate" step="0.5" value="6">
+                    </div>
+                    <small style="color: var(--text-secondary);">Your actual electricity cost per hour of printing</small>
+                </div>
+
+                <!-- Machine Settings -->
+                <div class="settings-card">
+                    <h4>Machine Costs</h4>
+                    <div class="setting-row">
+                        <span class="setting-label">Depreciation per hour</span>
+                        <input type="number" class="setting-input" id="depreciationRate" step="0.5" value="5">
+                    </div>
+                    <div class="setting-row">
+                        <span class="setting-label">Maintenance per hour</span>
+                        <input type="number" class="setting-input" id="maintenanceRate" step="0.5" value="5">
+                    </div>
+                    <div class="setting-row">
+                        <span class="setting-label">Failure buffer %</span>
+                        <input type="number" class="setting-input" id="failureBuffer" step="1" value="3">
+                    </div>
+                </div>
+
+                <!-- Labor Settings -->
+                <div class="settings-card">
+                    <h4>Labor Costs</h4>
+                    <div class="setting-row">
+                        <span class="setting-label">Setup cost (per print)</span>
+                        <input type="number" class="setting-input" id="setupCost" step="5" value="30">
+                    </div>
+                    <div class="setting-row">
+                        <span class="setting-label">Monitoring per hour</span>
+                        <input type="number" class="setting-input" id="monitoringRate" step="1" value="5">
+                    </div>
+                    <div class="setting-row">
+                        <span class="setting-label">Post-processing per hour</span>
+                        <input type="number" class="setting-input" id="postProcessingRate" step="5" value="50">
+                    </div>
+                </div>
+
+                <!-- Markup Settings -->
+                <div class="settings-card">
+                    <h4>Markup Strategy</h4>
+                    <div class="setting-row">
+                        <span class="setting-label">Retail base markup %</span>
+                        <input type="number" class="setting-input" id="retailMarkup" step="5" value="50">
+                    </div>
+                    <div class="setting-row">
+                        <span class="setting-label">Wholesale base markup %</span>
+                        <input type="number" class="setting-input" id="wholesaleMarkup" step="5" value="30">
+                    </div>
+                </div>
+
+                <!-- Volume Discounts Display -->
+                <div class="settings-card">
+                    <h4>Volume Discount Tiers</h4>
+                    <div class="volume-tiers-list" id="volumeTiersList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="settings-card">
+                    <h4>Actions</h4>
+                    <button class="btn btn-primary" id="saveSettings" style="width: 100%; margin-bottom: 10px;">Save All Settings</button>
+                    <button class="btn btn-secondary" id="resetSettings" style="width: 100%;">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Calculator Tab -->
+        <div id="calculator" class="pricing-tab-content">
+            <div class="card">
+                <h3>Quick Price Comparison</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Enter print specifications to see retail vs wholesale pricing at different quantities.
+                </p>
+
+                <div class="form-grid" style="max-width: 600px;">
+                    <div class="form-group">
+                        <label for="calcWeight">Weight (grams)</label>
+                        <input type="number" id="calcWeight" value="75">
+                    </div>
+                    <div class="form-group">
+                        <label for="calcTime">Print Time (hours)</label>
+                        <input type="number" id="calcTime" value="2.8" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="calcMaterial">Material</label>
+                        <select id="calcMaterial">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-primary" id="generateComparison" style="width: 100%;">Generate Comparison</button>
+                    </div>
+                </div>
+
+                <div class="quick-calc" style="margin-top: 30px;">
+                    <div class="calc-result-card">
+                        <div class="calc-result-label">Retail Price (1 unit)</div>
+                        <div class="calc-result-value" id="calcRetailPrice">₹0</div>
+                    </div>
+                    <div class="calc-result-card wholesale">
+                        <div class="calc-result-label">Wholesale Price (10 units)</div>
+                        <div class="calc-result-value" id="calcWholesalePrice">₹0</div>
+                    </div>
+                </div>
+
+                <table class="comparison-table" id="comparisonTable">
+                    <thead>
+                        <tr>
+                            <th>Quantity</th>
+                            <th>Retail (each)</th>
+                            <th>Retail Total</th>
+                            <th>Wholesale (each)</th>
+                            <th>Wholesale Total</th>
+                            <th>Savings</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparisonTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script type="module">
+        import pricingEngine from '../src/pricingEngine.js';
+        import quoteGenerator from '../src/quoteGenerator.js';
+
+        // State
+        let currentMode = 'retail';
+        let lastCalculation = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTabs();
+            populateMaterials();
+            populateSettings();
+            setupEventListeners();
+            updatePreview();
+        });
+
+        // Tab Management
+        function initializeTabs() {
+            const tabBtns = document.querySelectorAll('.pricing-tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+
+                    // Update buttons
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Update content
+                    document.querySelectorAll('.pricing-tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // Populate Materials
+        function populateMaterials() {
+            const materials = pricingEngine.getMaterials();
+
+            // Material select dropdowns
+            const selects = ['materialSelect', 'calcMaterial'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '';
+                    Object.entries(materials).forEach(([key, mat]) => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = `${mat.name} (₹${mat.cost}/kg)`;
+                        if (key === 'PLA') option.selected = true;
+                        select.appendChild(option);
+                    });
+                }
+            });
+
+            // Materials grid
+            const grid = document.getElementById('materialsGrid');
+            if (grid) {
+                grid.innerHTML = '';
+                Object.entries(materials).forEach(([key, mat]) => {
+                    const card = document.createElement('div');
+                    card.className = 'material-card';
+                    card.innerHTML = `
+                        <div class="material-name">${mat.name}</div>
+                        <div class="material-desc">${mat.description}</div>
+                        <input type="number" class="material-price-input"
+                            data-material="${key}" value="${mat.cost}" min="0" step="50">
+                        <div class="material-unit">₹ per kg</div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                // Add event listeners to material inputs
+                grid.querySelectorAll('.material-price-input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const material = e.target.dataset.material;
+                        const newCost = parseFloat(e.target.value);
+                        pricingEngine.updateMaterialCost(material, newCost);
+                        populateMaterials(); // Refresh selects
+                        updatePreview();
+                    });
+                });
+            }
+        }
+
+        // Populate Settings
+        function populateSettings() {
+            const config = pricingEngine.config;
+
+            document.getElementById('electricityRate').value = config.electricity.ratePerHour;
+            document.getElementById('depreciationRate').value = config.machine.depreciationPerHour;
+            document.getElementById('maintenanceRate').value = config.machine.maintenancePerHour;
+            document.getElementById('failureBuffer').value = config.machine.failureBuffer * 100;
+            document.getElementById('setupCost').value = config.labor.setupCost;
+            document.getElementById('monitoringRate').value = config.labor.monitoringPerHour;
+            document.getElementById('postProcessingRate').value = config.labor.postProcessingPerHour;
+            document.getElementById('retailMarkup').value = config.markup.retail.base * 100;
+            document.getElementById('wholesaleMarkup').value = config.markup.wholesale.base * 100;
+
+            // Volume tiers
+            const tiersList = document.getElementById('volumeTiersList');
+            if (tiersList) {
+                tiersList.innerHTML = '';
+                config.volumeDiscounts.forEach(tier => {
+                    const item = document.createElement('div');
+                    item.className = 'volume-tier-item';
+                    item.innerHTML = `
+                        <span class="tier-range">${tier.label}</span>
+                        <span class="tier-discount">${tier.discount}% off</span>
+                    `;
+                    tiersList.appendChild(item);
+                });
+            }
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Mode switch
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentMode = btn.dataset.mode;
+
+                    // Update badge
+                    const badge = document.getElementById('previewBadge');
+                    badge.textContent = currentMode === 'retail' ? 'Retail' : 'Wholesale';
+                    badge.className = `preview-mode-badge ${currentMode}`;
+
+                    updatePreview();
+                });
+            });
+
+            // Form inputs
+            const formInputs = ['printWeight', 'printTime', 'materialSelect', 'complexitySelect',
+                'quantity', 'rushOrder', 'postProcessing', 'itemName'];
+            formInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', updatePreview);
+                    el.addEventListener('input', updatePreview);
+                }
+            });
+
+            // Export buttons
+            document.getElementById('exportPdf').addEventListener('click', exportPdf);
+            document.getElementById('exportWhatsapp').addEventListener('click', exportWhatsapp);
+            document.getElementById('exportEmail').addEventListener('click', exportEmail);
+            document.getElementById('exportHtml').addEventListener('click', exportHtml);
+
+            // Settings
+            document.getElementById('saveSettings').addEventListener('click', saveSettings);
+            document.getElementById('resetSettings').addEventListener('click', resetSettings);
+            document.getElementById('resetMaterials').addEventListener('click', resetMaterials);
+
+            // Comparison calculator
+            document.getElementById('generateComparison').addEventListener('click', generateComparison);
+        }
+
+        // Update Preview
+        function updatePreview() {
+            const weight = parseFloat(document.getElementById('printWeight').value) || 75;
+            const time = parseFloat(document.getElementById('printTime').value) || 2.8;
+            const material = document.getElementById('materialSelect').value || 'PLA';
+            const complexity = document.getElementById('complexitySelect').value || 'moderate';
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const rush = document.getElementById('rushOrder').value || 'standard';
+            const itemName = document.getElementById('itemName').value || 'Custom 3D Print';
+
+            // Get selected post-processing
+            const ppSelect = document.getElementById('postProcessing');
+            const postProcessing = Array.from(ppSelect.selectedOptions).map(o => o.value);
+
+            // Calculate
+            lastCalculation = pricingEngine.calculateCosts({
+                weightGrams: weight,
+                printTimeHours: time,
+                material,
+                complexity,
+                quantity,
+                isWholesale: currentMode === 'wholesale',
+                rushOrder: rush,
+                postProcessing
+            });
+
+            const r = lastCalculation;
+
+            // Update preview
+            document.getElementById('previewItemName').textContent = itemName;
+            document.getElementById('previewMaterial').textContent = r.params.materialName;
+            document.getElementById('previewWeight').textContent = `${weight}g`;
+            document.getElementById('previewTime').textContent = `${time} hrs`;
+            document.getElementById('previewUnitPrice').textContent = formatCurrency(r.pricing.unitPrice);
+            document.getElementById('previewQuantity').textContent = `× ${quantity}`;
+            document.getElementById('previewTotal').textContent = formatCurrency(r.pricing.finalTotal);
+            document.getElementById('previewMargin').textContent = `${r.profit.margin.toFixed(1)}%`;
+
+            // Discount row
+            const discountRow = document.getElementById('previewDiscountRow');
+            if (r.pricing.volumeDiscount.percent > 0) {
+                discountRow.style.display = 'flex';
+                document.getElementById('previewDiscount').textContent =
+                    `-${formatCurrency(r.pricing.totalDiscount)} (${r.pricing.volumeDiscount.percent}%)`;
+            } else {
+                discountRow.style.display = 'none';
+            }
+
+            // Rush row
+            const rushRow = document.getElementById('previewRushRow');
+            if (r.pricing.rushPremium.percent > 0) {
+                rushRow.style.display = 'flex';
+                document.getElementById('previewRush').textContent =
+                    `+${formatCurrency(r.pricing.totalRushPremium)}`;
+            } else {
+                rushRow.style.display = 'none';
+            }
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // Export Functions
+        async function exportPdf() {
+            if (!lastCalculation) {
+                alert('Please fill in print details first');
+                return;
+            }
+
+            const result = await quoteGenerator.generatePDF(lastCalculation, {
+                customerName: document.getElementById('customerName').value || 'Valued Customer',
+                itemName: document.getElementById('itemName').value || 'Custom 3D Print'
+            });
+
+            if (result) {
+                result.download();
+            } else {
+                alert('PDF generation failed. Please try again.');
+            }
+        }
+
+        function exportWhatsapp() {
+            if (!lastCalculation) {
+                alert('Please fill in print details first');
+                return;
+            }
+
+            const result = quoteGenerator.generateWhatsAppMessage(lastCalculation, {
+                customerName: document.getElementById('customerName').value,
+                itemName: document.getElementById('itemName').value || 'Custom 3D Print'
+            });
+
+            navigator.clipboard.writeText(result.message).then(() => {
+                alert('Quote copied to clipboard! Opening WhatsApp...');
+                window.open(result.shareUrl, '_blank');
+            });
+        }
+
+        function exportEmail() {
+            if (!lastCalculation) {
+                alert('Please fill in print details first');
+                return;
+            }
+
+            const result = quoteGenerator.generateEmailContent(lastCalculation, {
+                customerName: document.getElementById('customerName').value,
+                itemName: document.getElementById('itemName').value || 'Custom 3D Print'
+            });
+
+            window.location.href = result.mailtoLink;
+        }
+
+        function exportHtml() {
+            if (!lastCalculation) {
+                alert('Please fill in print details first');
+                return;
+            }
+
+            const result = quoteGenerator.generateHTMLQuote(lastCalculation, {
+                customerName: document.getElementById('customerName').value || 'Valued Customer',
+                itemName: document.getElementById('itemName').value || 'Custom 3D Print'
+            });
+
+            // Open in new tab
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(result.html);
+            newWindow.document.close();
+        }
+
+        // Settings Functions
+        function saveSettings() {
+            const config = pricingEngine.config;
+
+            config.electricity.ratePerHour = parseFloat(document.getElementById('electricityRate').value);
+            config.machine.depreciationPerHour = parseFloat(document.getElementById('depreciationRate').value);
+            config.machine.maintenancePerHour = parseFloat(document.getElementById('maintenanceRate').value);
+            config.machine.failureBuffer = parseFloat(document.getElementById('failureBuffer').value) / 100;
+            config.labor.setupCost = parseFloat(document.getElementById('setupCost').value);
+            config.labor.monitoringPerHour = parseFloat(document.getElementById('monitoringRate').value);
+            config.labor.postProcessingPerHour = parseFloat(document.getElementById('postProcessingRate').value);
+            config.markup.retail.base = parseFloat(document.getElementById('retailMarkup').value) / 100;
+            config.markup.wholesale.base = parseFloat(document.getElementById('wholesaleMarkup').value) / 100;
+
+            pricingEngine.saveConfig();
+            updatePreview();
+            alert('Settings saved successfully!');
+        }
+
+        function resetSettings() {
+            if (confirm('Reset all settings to defaults?')) {
+                pricingEngine.resetToDefaults();
+                populateSettings();
+                populateMaterials();
+                updatePreview();
+                alert('Settings reset to defaults!');
+            }
+        }
+
+        function resetMaterials() {
+            if (confirm('Reset all material prices to defaults?')) {
+                pricingEngine.resetToDefaults();
+                populateMaterials();
+                updatePreview();
+                alert('Material prices reset to defaults!');
+            }
+        }
+
+        // Comparison Calculator
+        function generateComparison() {
+            const weight = parseFloat(document.getElementById('calcWeight').value) || 75;
+            const time = parseFloat(document.getElementById('calcTime').value) || 2.8;
+            const material = document.getElementById('calcMaterial').value || 'PLA';
+
+            // Quick prices
+            const retailPrice = pricingEngine.calculateRetailPrice(weight, time, material);
+            const wholesalePrice = pricingEngine.calculateWholesalePrice(weight, time, material, 'moderate', 10);
+
+            document.getElementById('calcRetailPrice').textContent = formatCurrency(retailPrice);
+            document.getElementById('calcWholesalePrice').textContent = formatCurrency(wholesalePrice);
+
+            // Generate comparison table
+            const table = pricingEngine.generatePriceTable(weight, time, material);
+            const tbody = document.getElementById('comparisonTableBody');
+            tbody.innerHTML = '';
+
+            table.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.quantity}</td>
+                    <td>${formatCurrency(row.retailUnit)}</td>
+                    <td>${formatCurrency(row.retailTotal)}</td>
+                    <td>${formatCurrency(row.wholesaleUnit)}</td>
+                    <td>${formatCurrency(row.wholesaleTotal)}</td>
+                    <td><span class="savings-badge">${formatCurrency(row.savings)} (${row.savingsPercent}%)</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Initial comparison
+        setTimeout(generateComparison, 100);
+    </script>
+</body>
+</html>

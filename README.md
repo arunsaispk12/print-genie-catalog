@@ -2,12 +2,13 @@
 
 A comprehensive catalog builder and management system for Print Genie's 3D printing business. This system includes category structures, SKU generation, product naming conventions, price calculator, and a web-based catalog builder.
 
-**Current Version:** v1.2.0 | [View Changelog](CHANGELOG.md)
+**Current Version:** v2.0.0 | [View Changelog](CHANGELOG.md)
 
 ## Live Demo
 
 - **Public Catalog:** https://arunsaispk12.github.io/print-genie-catalog/public/catalog.html
 - **Admin Panel:** https://arunsaispk12.github.io/print-genie-catalog/public/admin.html
+- **Pricing Manager:** https://arunsaispk12.github.io/print-genie-catalog/public/pricing-manager.html
 
 The catalog builder is hosted on GitHub Pages and ready to use!
 
@@ -67,7 +68,16 @@ print-genie-catalog/
 
 ## Features
 
-### v1.2.0 - Price Calculator (NEW)
+### v2.0.0 - Enhanced Pricing System (NEW)
+- **Standalone Pricing Manager** - Dedicated pricing tool with 4 tabs
+- **Corrected Electricity Rate** - ₹6/hour (actual cost)
+- **Editable Material Prices** - Update supplier costs anytime
+- **Rush Order Premiums** - Express (+20%), Rush (+40%), Same-day (+75%)
+- **7 Volume Discount Tiers** - Up to 30% off for 100+ units
+- **Visual PDF Quotes** - Professional, branded documents
+- **Post-Processing Options** - Support removal, sanding, painting, assembly
+
+### v1.2.0 - Price Calculator
 - **Retail/Bulk Pricing Modes** - Different margins for customer types
 - **Cost Breakdown** - Material, electricity, depreciation, maintenance, labor
 - **Volume Discounts** - 5% (25+), 10% (50+), 15% (100+ units) for bulk
@@ -201,6 +211,7 @@ Modify `public/styles.css` - CSS variables in `:root` for easy theming.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| v2.0.0 | 2026-01-19 | Enhanced Pricing Engine, ₹6/hr electricity, Pricing Manager |
 | v1.2.0 | 2026-01-19 | Price Calculator, Cost Settings, Quote Exports |
 | v1.1.0 | 2026-01-08 | INR currency, Images, Category management, Auto-publish |
 | v1.0.0 | 2026-01-07 | Initial release, SKU system, Basic catalog |

@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] - 2026-01-19
+
+### Added
+- **Enhanced Pricing Engine** (`src/pricingEngine.js`)
+  - Corrected electricity rate: ₹6/hour (actual rate)
+  - Material costs editable with localStorage persistence
+  - Complexity multipliers (Simple to Very Complex)
+  - Rush order premiums (Express +20%, Rush +40%, Same-day +75%)
+  - Post-processing options with costs
+  - 3% failure buffer in cost calculations
+  - Automation factor for reduced labor costs
+  - Volume discounts up to 30% (7 tiers)
+- **Quote Generator** (`src/quoteGenerator.js`)
+  - Visual HTML quote generation with Print Genie branding
+  - PDF export with professional layout
+  - WhatsApp message formatting with emojis
+  - Email content generation with mailto links
+  - Different layouts for Retail vs Wholesale
+  - Cost breakdown display for wholesale quotes
+  - Volume pricing tier tables
+- **Standalone Pricing Manager** (`public/pricing-manager.html`)
+  - 4-tab interface: Quote Generator, Material Prices, Settings, Calculator
+  - Live price preview with real-time updates
+  - Editable material costs grid
+  - Configurable settings for all cost parameters
+  - Quick comparison calculator with retail vs wholesale table
+  - All export options (PDF, WhatsApp, Email, HTML)
+
+### Changed
+- Electricity cost model: from kWh calculation to direct ₹6/hour rate
+- Labor cost model: added automation factor (50% reduction)
+- Volume discount tiers: expanded to 7 tiers (up to 30% off)
+- Markup strategy: separate retail (50%) and wholesale (30%) base markups
+
+---
+
 ## [1.2.0] - 2026-01-19
 
 ### Added
