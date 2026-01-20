@@ -619,45 +619,6 @@ function exportToPDF() {
 
     yPos = boxY + boxHeight + 10;
 
-    // ========== COST BREAKDOWN (WHOLESALE ONLY) ==========
-    if (data.mode === 'bulk') {
-        // Cost breakdown box
-        doc.setFillColor(249, 250, 251);
-        doc.roundedRect(20, yPos, pageWidth - 40, 55, 3, 3, 'F');
-
-        yPos += 8;
-        doc.setFontSize(10);
-        doc.setTextColor(55, 65, 81);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Cost Breakdown (Per Unit)', 25, yPos);
-
-        yPos += 8;
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-
-        const costs = [
-            ['Material Cost', formatPDFCurrency(data.costs.material)],
-            ['Electricity Cost', formatPDFCurrency(data.costs.electricity)],
-            ['Machine Costs', formatPDFCurrency(data.costs.depreciation + data.costs.maintenance)],
-            ['Labor Cost', formatPDFCurrency(data.costs.labor)],
-            ['Production Cost', formatPDFCurrency(data.costs.total)],
-            [`Profit (${data.profitMargin}%)`, formatPDFCurrency(data.profitAmount)]
-        ];
-
-        let costY = yPos;
-        costs.forEach(([label, value], i) => {
-            const xOffset = i < 3 ? 0 : 85;
-            const yOffset = i < 3 ? i * 7 : (i - 3) * 7;
-
-            doc.setTextColor(107, 114, 128);
-            doc.text(label, 30 + xOffset, costY + yOffset);
-            doc.setTextColor(17, 24, 39);
-            doc.text(value, 75 + xOffset, costY + yOffset, { align: 'right' });
-        });
-
-        yPos += 40;
-    }
-
     // ========== PRICING SUMMARY ==========
     yPos += 5;
     doc.setFontSize(10);
@@ -969,21 +930,6 @@ function exportToCSV() {
         data.discountAmount,
         data.finalTotal
     ];
-
-    // Add cost breakdown for bulk orders
-    if (data.mode === 'bulk') {
-        headers.push('Material Cost', 'Electricity Cost', 'Depreciation Cost', 'Maintenance Cost', 'Labor Cost', 'Total Cost', 'Profit Margin %', 'Profit Amount');
-        values.push(
-            data.costs.material.toFixed(2),
-            data.costs.electricity.toFixed(2),
-            data.costs.depreciation.toFixed(2),
-            data.costs.maintenance.toFixed(2),
-            data.costs.labor.toFixed(2),
-            data.costs.total.toFixed(2),
-            data.profitMargin,
-            data.profitAmount.toFixed(2)
-        );
-    }
 
     const csvContent = [
         headers.join(','),
