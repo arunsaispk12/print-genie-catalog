@@ -582,7 +582,6 @@ function exportToPDF() {
     const specs = [
         { label: 'Material', value: data.material },
         { label: 'Weight', value: `${data.weight}g` },
-        { label: 'Print Time', value: `${data.printTime} hrs` },
         { label: 'Complexity', value: data.complexityName },
         { label: 'Quantity', value: `${data.quantity} units` },
         { label: 'Delivery', value: 'Standard (5-7 days)' }
@@ -870,8 +869,7 @@ function exportToWhatsApp() {
     message += `*${data.itemName}*\n\n`;
     message += `Material: ${data.material}\n`;
     message += `Complexity: ${data.complexityName}\n`;
-    message += `Weight: ${data.weight}g\n`;
-    message += `Print Time: ${data.printTime} hours\n\n`;
+    message += `Weight: ${data.weight}g\n\n`;
     message += `━━━━━━━━━━━━━━━━\n`;
     message += `*Pricing (${data.modeName})*\n`;
     message += `Unit Price: ${formatCurrency(data.unitPrice)}\n`;
@@ -919,8 +917,7 @@ function exportToEmail() {
     body += `Item: ${data.itemName}\n`;
     body += `Material: ${data.material}\n`;
     body += `Complexity: ${data.complexityName}\n`;
-    body += `Weight: ${data.weight}g\n`;
-    body += `Print Time: ${data.printTime} hours\n\n`;
+    body += `Weight: ${data.weight}g\n\n`;
     body += `=== Pricing Summary ===\n`;
     body += `Unit Price: ${formatCurrency(data.unitPrice)}\n`;
     body += `Quantity: ${data.quantity}\n`;
@@ -953,7 +950,7 @@ function exportToCSV() {
 
     const headers = [
         'Quote ID', 'Date', 'Customer Type', 'Item Name',
-        'Material', 'Complexity', 'Weight (g)', 'Print Time (hrs)',
+        'Material', 'Complexity', 'Weight (g)',
         'Unit Price', 'Quantity', 'Subtotal', 'Discount %', 'Discount Amount', 'Final Total'
     ];
 
@@ -965,7 +962,6 @@ function exportToCSV() {
         data.material,
         data.complexityName,
         data.weight,
-        data.printTime,
         data.unitPrice,
         data.quantity,
         data.subtotal,
@@ -1068,7 +1064,7 @@ function exportToImage() {
 
     yPos += 50;
     ctx.fillText(`Weight: ${data.weight}g`, 100, yPos);
-    ctx.fillText(`Print Time: ${data.printTime} hours`, 550, yPos);
+    ctx.fillText(`Quantity: ${data.quantity} units`, 550, yPos);
 
     // Pricing Box
     yPos += 80;
