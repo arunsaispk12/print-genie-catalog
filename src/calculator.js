@@ -453,7 +453,26 @@ function setupExportButtons() {
     if (imageBtn) imageBtn.addEventListener('click', exportToImage);
 }
 
-// Export to PDF
+// Company Info for PDF
+const companyInfo = {
+    name: 'Print Genie',
+    tagline: 'Digital Craftsmanship & Automation',
+    phone: '+91 98765 43210',
+    email: 'orders@printgenie.in',
+    website: 'www.printgenie.in',
+    address: 'Hyderabad, India',
+    upiId: 'printgenie@upi',
+    bankName: 'State Bank of India',
+    accountNo: 'XXXXXXXXXXXX',
+    ifscCode: 'SBIN0XXXXXX'
+};
+
+// Format currency for PDF (using Rs. for better compatibility)
+function formatPDFCurrency(amount) {
+    return `Rs. ${amount.toFixed(2)}`;
+}
+
+// Export to PDF - Enhanced Version
 function exportToPDF() {
     if (!lastCalculation) {
         alert('Please calculate a price first!');
@@ -470,128 +489,368 @@ function exportToPDF() {
     const doc = new jsPDF();
 
     const data = lastCalculation;
-    let yPos = 20;
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Header
-    doc.setFontSize(24);
+    // Calculate validity date (7 days from now)
+    const validityDate = new Date();
+    validityDate.setDate(validityDate.getDate() + 7);
+    const validityDateStr = validityDate.toLocaleDateString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric'
+    });
+
+    // ========== HEADER WITH GRADIENT EFFECT ==========
+    // Purple gradient header bar
+    doc.setFillColor(99, 102, 241);
+    doc.rect(0, 0, pageWidth, 45, 'F');
+
+    // Gradient overlay (darker at bottom)
+    doc.setFillColor(79, 70, 229);
+    doc.rect(0, 35, pageWidth, 10, 'F');
+
+    // Company name
+    doc.setFontSize(26);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text(companyInfo.name, 20, 22);
+
+    // Tagline
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(companyInfo.tagline, 20, 32);
+
+    // Quote info on right
+    doc.setFontSize(10);
+    doc.text(`Quote: ${data.quoteId}`, pageWidth - 20, 18, { align: 'right' });
+    doc.setFontSize(9);
+    doc.text(`Date: ${new Date(data.quoteDate).toLocaleDateString('en-IN')}`, pageWidth - 20, 26, { align: 'right' });
+
+    // Mode badge
+    const badgeText = data.mode === 'bulk' ? 'WHOLESALE' : 'RETAIL';
+    const badgeColor = data.mode === 'bulk' ? [16, 185, 129] : [99, 102, 241];
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(pageWidth - 55, 30, 35, 8, 2, 2, 'F');
+    doc.setFontSize(7);
+    doc.setTextColor(...badgeColor);
+    doc.setFont('helvetica', 'bold');
+    doc.text(badgeText, pageWidth - 37.5, 35.5, { align: 'center' });
+
+    let yPos = 55;
+
+    // ========== CUSTOMER & ITEM SECTION ==========
+    doc.setFont('helvetica', 'normal');
+
+    // Customer section (left)
+    doc.setFontSize(8);
+    doc.setTextColor(107, 114, 128);
+    doc.text('PREPARED FOR', 20, yPos);
+
+    yPos += 6;
+    doc.setFontSize(12);
+    doc.setTextColor(17, 24, 39);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Valued Customer', 20, yPos);
+
+    // Item section (right)
+    doc.setFontSize(8);
+    doc.setTextColor(107, 114, 128);
+    doc.setFont('helvetica', 'normal');
+    doc.text('ITEM', 110, yPos - 6);
+
+    doc.setFontSize(12);
     doc.setTextColor(99, 102, 241);
-    doc.text('Print Genie', 20, yPos);
+    doc.setFont('helvetica', 'bold');
+    doc.text(data.itemName, 110, yPos);
+
+    yPos += 12;
+
+    // Divider line
+    doc.setDrawColor(229, 231, 235);
+    doc.setLineWidth(0.5);
+    doc.line(20, yPos, pageWidth - 20, yPos);
 
     yPos += 10;
-    doc.setFontSize(12);
-    doc.setTextColor(107, 114, 128);
-    doc.text('3D Printing Price Quote', 20, yPos);
 
-    // Quote Details
-    yPos += 20;
+    // ========== SPECIFICATIONS GRID ==========
     doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Quote ID: ${data.quoteId}`, 20, yPos);
-    doc.text(`Date: ${new Date(data.quoteDate).toLocaleDateString()}`, 120, yPos);
+    doc.setTextColor(17, 24, 39);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Specifications', 20, yPos);
 
     yPos += 8;
-    doc.text(`Customer Type: ${data.modeName}`, 20, yPos);
 
-    // Divider
-    yPos += 10;
-    doc.setDrawColor(229, 231, 235);
-    doc.line(20, yPos, 190, yPos);
+    // Specs in a grid layout
+    const specs = [
+        { label: 'Material', value: data.material },
+        { label: 'Weight', value: `${data.weight}g` },
+        { label: 'Print Time', value: `${data.printTime} hrs` },
+        { label: 'Complexity', value: data.complexityName },
+        { label: 'Quantity', value: `${data.quantity} units` },
+        { label: 'Delivery', value: 'Standard (5-7 days)' }
+    ];
 
-    // Item Details
-    yPos += 15;
-    doc.setFontSize(14);
-    doc.setTextColor(17, 24, 39);
-    doc.text('Item Details', 20, yPos);
+    // Draw spec boxes
+    const boxWidth = 55;
+    const boxHeight = 18;
+    let boxX = 20;
+    let boxY = yPos;
 
-    yPos += 10;
-    doc.setFontSize(10);
-    doc.text(`Item: ${data.itemName}`, 20, yPos);
+    specs.forEach((spec, i) => {
+        // Box background
+        doc.setFillColor(249, 250, 251);
+        doc.roundedRect(boxX, boxY, boxWidth, boxHeight, 2, 2, 'F');
 
-    yPos += 7;
-    doc.text(`Material: ${data.material}`, 20, yPos);
-    doc.text(`Complexity: ${data.complexityName}`, 100, yPos);
+        // Label
+        doc.setFontSize(7);
+        doc.setTextColor(107, 114, 128);
+        doc.setFont('helvetica', 'normal');
+        doc.text(spec.label, boxX + boxWidth / 2, boxY + 6, { align: 'center' });
 
-    yPos += 7;
-    doc.text(`Weight: ${data.weight}g`, 20, yPos);
-    doc.text(`Print Time: ${data.printTime} hours`, 100, yPos);
+        // Value
+        doc.setFontSize(9);
+        doc.setTextColor(17, 24, 39);
+        doc.setFont('helvetica', 'bold');
+        doc.text(spec.value, boxX + boxWidth / 2, boxY + 13, { align: 'center' });
 
-    // Cost Breakdown (for bulk orders)
+        boxX += boxWidth + 3;
+        if ((i + 1) % 3 === 0) {
+            boxX = 20;
+            boxY += boxHeight + 3;
+        }
+    });
+
+    yPos = boxY + boxHeight + 10;
+
+    // ========== COST BREAKDOWN (WHOLESALE ONLY) ==========
     if (data.mode === 'bulk') {
-        yPos += 15;
-        doc.setFontSize(14);
-        doc.text('Cost Breakdown', 20, yPos);
+        // Cost breakdown box
+        doc.setFillColor(249, 250, 251);
+        doc.roundedRect(20, yPos, pageWidth - 40, 55, 3, 3, 'F');
 
-        yPos += 10;
+        yPos += 8;
         doc.setFontSize(10);
+        doc.setTextColor(55, 65, 81);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Cost Breakdown (Per Unit)', 25, yPos);
+
+        yPos += 8;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
 
         const costs = [
-            ['Material Cost', formatCurrency(data.costs.material)],
-            ['Electricity Cost', formatCurrency(data.costs.electricity)],
-            ['Depreciation Cost', formatCurrency(data.costs.depreciation)],
-            ['Maintenance Cost', formatCurrency(data.costs.maintenance)],
-            ['Labor Cost', formatCurrency(data.costs.labor)],
-            ['Total Production Cost', formatCurrency(data.costs.total)],
-            [`Profit Margin (${data.profitMargin}%)`, formatCurrency(data.profitAmount)]
+            ['Material Cost', formatPDFCurrency(data.costs.material)],
+            ['Electricity Cost', formatPDFCurrency(data.costs.electricity)],
+            ['Machine Costs', formatPDFCurrency(data.costs.depreciation + data.costs.maintenance)],
+            ['Labor Cost', formatPDFCurrency(data.costs.labor)],
+            ['Production Cost', formatPDFCurrency(data.costs.total)],
+            [`Profit (${data.profitMargin}%)`, formatPDFCurrency(data.profitAmount)]
         ];
 
-        costs.forEach(([label, value]) => {
-            doc.text(label, 25, yPos);
-            doc.text(value, 150, yPos);
-            yPos += 7;
+        let costY = yPos;
+        costs.forEach(([label, value], i) => {
+            const xOffset = i < 3 ? 0 : 85;
+            const yOffset = i < 3 ? i * 7 : (i - 3) * 7;
+
+            doc.setTextColor(107, 114, 128);
+            doc.text(label, 30 + xOffset, costY + yOffset);
+            doc.setTextColor(17, 24, 39);
+            doc.text(value, 75 + xOffset, costY + yOffset, { align: 'right' });
         });
+
+        yPos += 40;
     }
 
-    // Pricing Summary
-    yPos += 10;
-    doc.setFontSize(14);
+    // ========== PRICING SUMMARY ==========
+    yPos += 5;
+    doc.setFontSize(10);
+    doc.setTextColor(17, 24, 39);
+    doc.setFont('helvetica', 'bold');
     doc.text('Pricing Summary', 20, yPos);
 
     yPos += 10;
-    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
 
-    doc.text('Unit Price:', 25, yPos);
-    doc.text(formatCurrency(data.unitPrice), 150, yPos);
+    // Pricing rows
+    const pricingRows = [
+        ['Unit Price', formatPDFCurrency(data.unitPrice)],
+        ['Quantity', `x ${data.quantity}`],
+        ['Subtotal', formatPDFCurrency(data.subtotal)]
+    ];
 
-    yPos += 7;
-    doc.text('Quantity:', 25, yPos);
-    doc.text(data.quantity.toString(), 150, yPos);
+    pricingRows.forEach(([label, value]) => {
+        doc.setTextColor(75, 85, 99);
+        doc.text(label, 25, yPos);
+        doc.setTextColor(17, 24, 39);
+        doc.setFont('helvetica', 'bold');
+        doc.text(value, pageWidth - 25, yPos, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+        yPos += 8;
+    });
 
-    yPos += 7;
-    doc.text('Subtotal:', 25, yPos);
-    doc.text(formatCurrency(data.subtotal), 150, yPos);
-
+    // Volume discount row (if applicable)
     if (data.discountPercent > 0) {
-        yPos += 7;
+        doc.setFillColor(236, 253, 245);
+        doc.rect(20, yPos - 5, pageWidth - 40, 10, 'F');
         doc.setTextColor(16, 185, 129);
-        doc.text(`Volume Discount (${data.discountPercent}%):`, 25, yPos);
-        doc.text(`-${formatCurrency(data.discountAmount)}`, 150, yPos);
+        doc.text(`Volume Discount (${data.discountPercent}%)`, 25, yPos + 2);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`- ${formatPDFCurrency(data.discountAmount)}`, pageWidth - 25, yPos + 2, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+        yPos += 12;
     }
 
-    yPos += 12;
+    // Total row with gradient background
+    yPos += 3;
+    doc.setFillColor(99, 102, 241);
+    doc.roundedRect(20, yPos - 5, pageWidth - 40, 16, 3, 3, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTAL AMOUNT', 25, yPos + 5);
     doc.setFontSize(14);
-    doc.setTextColor(99, 102, 241);
-    doc.text('TOTAL:', 25, yPos);
-    doc.text(formatCurrency(data.finalTotal), 150, yPos);
+    doc.text(formatPDFCurrency(data.finalTotal), pageWidth - 25, yPos + 5, { align: 'right' });
 
-    // Terms & Conditions
     yPos += 20;
-    doc.setFontSize(9);
-    doc.setTextColor(107, 114, 128);
-    doc.text('Terms & Conditions:', 20, yPos);
-    yPos += 6;
-    doc.text('- Prices are valid for 7 days from the quote date', 25, yPos);
-    yPos += 5;
-    doc.text('- 50% advance payment required to start production', 25, yPos);
-    yPos += 5;
-    doc.text('- Delivery time depends on print complexity and order volume', 25, yPos);
-    yPos += 5;
-    doc.text('- Final price may vary based on actual material usage', 25, yPos);
 
-    // Footer
-    yPos = 280;
+    // ========== VOLUME DISCOUNT TABLE (WHOLESALE) ==========
+    if (data.mode === 'bulk') {
+        yPos += 5;
+        doc.setFontSize(9);
+        doc.setTextColor(55, 65, 81);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Volume Pricing Tiers', 20, yPos);
+
+        yPos += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+
+        // Table header
+        doc.setFillColor(99, 102, 241);
+        doc.rect(20, yPos, pageWidth - 40, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.text('Quantity', 30, yPos + 5);
+        doc.text('Discount', 80, yPos + 5);
+        doc.text('Est. Unit Price', 130, yPos + 5);
+
+        yPos += 8;
+
+        const volumeTiers = [
+            { range: '10-24 units', discount: '0%', multiplier: 1.0 },
+            { range: '25-49 units', discount: '5%', multiplier: 0.95 },
+            { range: '50-99 units', discount: '10%', multiplier: 0.90 },
+            { range: '100+ units', discount: '15%', multiplier: 0.85 }
+        ];
+
+        volumeTiers.forEach((tier, i) => {
+            const isCurrent = (
+                (data.quantity >= 10 && data.quantity <= 24 && i === 0) ||
+                (data.quantity >= 25 && data.quantity <= 49 && i === 1) ||
+                (data.quantity >= 50 && data.quantity <= 99 && i === 2) ||
+                (data.quantity >= 100 && i === 3)
+            );
+
+            if (isCurrent) {
+                doc.setFillColor(236, 253, 245);
+                doc.rect(20, yPos, pageWidth - 40, 7, 'F');
+            } else if (i % 2 === 0) {
+                doc.setFillColor(249, 250, 251);
+                doc.rect(20, yPos, pageWidth - 40, 7, 'F');
+            }
+
+            doc.setTextColor(isCurrent ? 16 : 75, isCurrent ? 185 : 85, isCurrent ? 129 : 99);
+            doc.setFont('helvetica', isCurrent ? 'bold' : 'normal');
+            doc.text(tier.range, 30, yPos + 5);
+            doc.text(tier.discount, 80, yPos + 5);
+            const estPrice = data.unitPrice * tier.multiplier;
+            doc.text(formatPDFCurrency(Math.ceil(estPrice / 5) * 5) + (isCurrent ? ' (Current)' : ''), 130, yPos + 5);
+
+            yPos += 7;
+        });
+
+        yPos += 5;
+    }
+
+    // ========== TERMS & PAYMENT INFO ==========
+    yPos += 5;
+
+    // Two columns: Terms and Payment
+    doc.setFillColor(249, 250, 251);
+    doc.roundedRect(20, yPos, 82, 45, 2, 2, 'F');
+    doc.roundedRect(108, yPos, 82, 45, 2, 2, 'F');
+
+    // Terms column
+    yPos += 6;
     doc.setFontSize(8);
+    doc.setTextColor(55, 65, 81);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Terms & Conditions', 25, yPos);
+
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
     doc.setTextColor(107, 114, 128);
-    doc.text('Thank you for choosing Print Genie!', 105, yPos, { align: 'center' });
+
+    const terms = [
+        `Valid until: ${validityDateStr}`,
+        '50% advance to confirm order',
+        'Balance before delivery',
+        'Colors may vary slightly',
+        'Custom orders non-refundable'
+    ];
+
+    terms.forEach(term => {
+        doc.text(`• ${term}`, 25, yPos);
+        yPos += 5;
+    });
+
+    // Payment column
+    yPos -= 25;
+    doc.setFontSize(8);
+    doc.setTextColor(55, 65, 81);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Payment Details', 113, yPos - 6);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(107, 114, 128);
+
+    const paymentInfo = [
+        `UPI: ${companyInfo.upiId}`,
+        `Bank: ${companyInfo.bankName}`,
+        `A/C: ${companyInfo.accountNo}`,
+        `IFSC: ${companyInfo.ifscCode}`,
+        'GPay/PhonePe accepted'
+    ];
+
+    paymentInfo.forEach(info => {
+        doc.text(`• ${info}`, 113, yPos);
+        yPos += 5;
+    });
+
+    // ========== FOOTER ==========
+    const footerY = 275;
+
+    // Footer background
+    doc.setFillColor(31, 41, 55);
+    doc.rect(0, footerY - 5, pageWidth, 25, 'F');
+
+    // Company name
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(companyInfo.name, pageWidth / 2, footerY + 2, { align: 'center' });
+
+    // Contact info
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    const contactLine = `${companyInfo.phone}  |  ${companyInfo.email}  |  ${companyInfo.website}`;
+    doc.text(contactLine, pageWidth / 2, footerY + 9, { align: 'center' });
+
+    // Thank you message
+    doc.setTextColor(156, 163, 175);
+    doc.setFontSize(6);
+    doc.text('Thank you for choosing Print Genie! We look forward to bringing your ideas to life.', pageWidth / 2, footerY + 15, { align: 'center' });
 
     // Save PDF
     doc.save(`PrintGenie-Quote-${data.quoteId}.pdf`);
